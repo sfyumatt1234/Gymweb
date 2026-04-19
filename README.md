@@ -61,15 +61,16 @@ Domain model:
 
 ## Quick start (Windows)
 
-Just double-click **`start.bat`** in the repo root. It will:
+Double-click **`start.bat`** or **`start_server.bat`** in the repo root. **`start_server.bat`** loads **`.env.local`** first (if present), then `.env`; **`start.bat`** only loads `.env`. Both scripts will:
 
 1. Create `.venv/` and install dependencies
-2. Load `.env` if present
+2. Load the env file(s) above when present
 3. Run migrations and seed the default *Full Body 3x/week* program
 4. Start the dev server at <http://127.0.0.1:5174/>
 
 By default it expects MySQL on `127.0.0.1:3306` with database `gymweb` and user `root`. Override
-those by copying `.env.example` to `.env`. For a zero-config run set `DB_ENGINE=sqlite` in `.env`.
+those by copying `.env.example` to `.env` or `.env.local`. For a zero-config run set `DB_ENGINE=sqlite`.
+If you use Docker Compose, set `DB_HOST` to the MySQL service name (often `db`) **only** inside the container network; on the Windows host use `127.0.0.1` (or the published port).
 
 ## Quick start (macOS / Linux)
 
