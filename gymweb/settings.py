@@ -3,27 +3,65 @@ Django settings for the gymweb project.
 
 Local-first body composition + workout tracker.
 Database: MySQL (default) with a SQLite fallback for quick local dev.
+
+Environment loading
+-------------------
+We look for env files in this order and use the first one that exists:
+    1. .env.local   (git-ignored, personal dev overrides)
+    2. .env         (shared template / production values)
+
+Both short names (SECRET_KEY, DEBUG, ALLOWED_HOSTS, ...) and DJANGO_* names
+are accepted so .env.local files from other tooling "just work".
 """
 
 from pathlib import Path
-import os
 
-from decouple import config, Csv
+from decouple import Config, RepositoryEnv, config as _default_config, Csv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config(
+
+def _load_config():
+    for name in (".env.local", ".env"):
+        candidate = BASE_DIR / name
+        if candidate.exists():
+            return Config(RepositoryEnv(str(candidate)))
+    return _default_config
+
+
+config = _load_config()
+
+
+def _cfg(*keys, default=None, cast=None):
+    """Return the first env var found among ``keys`` (falls back to ``default``).
+
+    We intentionally read the raw value first so that the ``cast`` callable
+    is never applied to our internal sentinel.
+    """
+    sentinel = object()
+    for key in keys:
+        raw = config(key, default=sentinel)
+        if raw is not sentinel:
+            return cast(raw) if cast is not None else raw
+    return default
+
+
+SECRET_KEY = _cfg(
     "DJANGO_SECRET_KEY",
+    "SECRET_KEY",
     default="django-insecure-change-me-in-production-please-0p^5w@^=c",
 )
 
-DEBUG = config("DJANGO_DEBUG", default=True, cast=bool)
+DEBUG = _cfg("DJANGO_DEBUG", "DEBUG", default=True, cast=bool)
 
-ALLOWED_HOSTS = config(
+ALLOWED_HOSTS = _cfg(
     "DJANGO_ALLOWED_HOSTS",
+    "ALLOWED_HOSTS",
     default="127.0.0.1,localhost,0.0.0.0,test.gigxmatch.com",
     cast=Csv(),
 )
+if "test.gigxmatch.com" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS = list(ALLOWED_HOSTS) + ["test.gigxmatch.com"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -67,7 +105,7 @@ WSGI_APPLICATION = "gymweb.wsgi.application"
 
 # Database configuration.
 # DB_ENGINE can be "mysql" (default) or "sqlite" for a quick start.
-DB_ENGINE = config("DB_ENGINE", default="mysql").lower()
+DB_ENGINE = _cfg("DB_ENGINE", default="mysql").lower()
 
 if DB_ENGINE == "sqlite":
     DATABASES = {
@@ -80,11 +118,11 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
-            "NAME": config("DB_NAME", default="gymweb"),
-            "USER": config("DB_USER", default="root"),
-            "PASSWORD": config("DB_PASSWORD", default=""),
-            "HOST": config("DB_HOST", default="127.0.0.1"),
-            "PORT": config("DB_PORT", default="3306"),
+            "NAME": _cfg("DB_NAME", default="gymweb"),
+            "USER": _cfg("DB_USER", default="root"),
+            "PASSWORD": _cfg("DB_PASSWORD", default=""),
+            "HOST": _cfg("DB_HOST", default="127.0.0.1"),
+            "PORT": _cfg("DB_PORT", default="3306"),
             "OPTIONS": {
                 "charset": "utf8mb4",
                 "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -101,7 +139,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = config("DJANGO_TIME_ZONE", default="UTC")
+TIME_ZONE = _cfg("DJANGO_TIME_ZONE", "TIME_ZONE", default="UTC")
 USE_I18N = True
 USE_TZ = True
 
