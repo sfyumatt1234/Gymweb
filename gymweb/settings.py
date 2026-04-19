@@ -21,7 +21,7 @@ DEBUG = config("DJANGO_DEBUG", default=True, cast=bool)
 
 ALLOWED_HOSTS = config(
     "DJANGO_ALLOWED_HOSTS",
-    default="127.0.0.1,localhost,0.0.0.0",
+    default="127.0.0.1,localhost,0.0.0.0,test.gigxmatch.com",
     cast=Csv(),
 )
 
