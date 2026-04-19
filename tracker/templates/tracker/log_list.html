@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Log · Gymweb{% endblock %}
+
+{% block content %}
+<div class="row">
+  <h1>Body log</h1>
+  <div class="actions">
+    <a class="btn" href="{% url 'tracker:log_create' %}">+ New measurement</a>
+    <a class="btn ghost" href="{% url 'tracker:log_export' %}">Export CSV</a>
+  </div>
+</div>
+
+{% if entries %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>When</th>
+      <th>Weight (kg)</th>
+      <th>Body fat (%)</th>
+      <th>Muscle (kg)</th>
+      <th>BMI</th>
+      <th>Source</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in entries %}
+    <tr>
+      <td>{{ e.log.measured_at|date:"Y-m-d H:i" }}</td>
+      <td>{{ e.log.weight_kg|default:"—" }}</td>
+      <td>{{ e.log.body_fat_pct|default:"—" }}</td>
+      <td>{{ e.log.muscle_kg|default:"—" }}</td>
+      <td>{{ e.bmi|default:"—" }}</td>
+      <td>{{ e.log.get_source_display }}</td>
+      <td>
+        <form method="post" action="{% url 'tracker:log_delete' e.log.id %}" onsubmit="return confirm('Delete this entry?');">
+          {% csrf_token %}
+          <button class="btn danger" type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No measurements yet. Add your first one to start tracking trends.</p>
+{% endif %}
+{% endblock %}

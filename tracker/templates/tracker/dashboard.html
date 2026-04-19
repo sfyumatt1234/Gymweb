@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · Gymweb{% endblock %}
+
+{% block content %}
+<section class="grid">
+  <div class="card">
+    <h2>BMI</h2>
+    {% if bmi %}
+      <p class="big">{{ bmi }}</p>
+      <p class="muted">{{ bmi_category }} · derived from height ({{ profile.height_cm }} cm) and weight.</p>
+    {% else %}
+      <p class="muted">Add a body measurement and your height to see BMI.</p>
+    {% endif %}
+    <p class="tiny">BMI is a screening number, not a body-composition measure.</p>
+  </div>
+
+  <div class="card">
+    <h2>Latest body composition</h2>
+    {% if latest %}
+      <ul class="kv">
+        <li><span>Weight</span><b>{{ latest.weight_kg|default:"—" }} kg</b></li>
+        <li><span>Body fat</span><b>{{ latest.body_fat_pct|default:"—" }} %</b></li>
+        <li><span>Muscle</span><b>{{ latest.muscle_kg|default:"—" }} kg{% if latest.muscle_pct %} ({{ latest.muscle_pct }} %){% endif %}</b></li>
+      </ul>
+      <p class="muted">Recorded {{ latest.measured_at|date:"Y-m-d H:i" }} · source: {{ latest.get_source_display }}</p>
+    {% else %}
+      <p class="muted">No measurements yet.</p>
+    {% endif %}
+    <p><a class="btn" href="{% url 'tracker:log_create' %}">Log new measurement</a></p>
+  </div>
+
+  <div class="card wide">
+    <h2>Last 30 days</h2>
+    <canvas id="trendChart" height="120"></canvas>
+  </div>
+
+  <div class="card wide">
+    <h2>Programs</h2>
+    {% if programs %}
+      <ul class="plain">
+        {% for p in programs %}
+          <li><a href="{% url 'tracker:program_detail' p.id %}">{{ p.name }}</a>{% if p.is_default %} <span class="pill">default</span>{% endif %}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">No programs yet. Run <code>python manage.py seed_program</code>.</p>
+    {% endif %}
+  </div>
+</section>
+
+{{ series_json|json_script:"trend-data" }}
+<script>
+(function () {
+  var data = JSON.parse(document.getElementById('trend-data').textContent);
+  function init() {
+    if (typeof Chart === 'undefined') { return setTimeout(init, 50); }
+    var ctx = document.getElementById('trendChart');
+    if (!ctx) return;
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.labels,
+        datasets: [
+          { label: 'Weight (kg)', data: data.weight, borderColor: '#2563eb', tension: .2, spanGaps: true },
+          { label: 'Body fat (%)', data: data.fat, borderColor: '#dc2626', tension: .2, spanGaps: true },
+          { label: 'Muscle (kg)', data: data.muscle_kg, borderColor: '#16a34a', tension: .2, spanGaps: true },
+          { label: 'BMI', data: data.bmi, borderColor: '#9333ea', tension: .2, spanGaps: true, hidden: true }
+        ]
+      },
+      options: { responsive: true, interaction: { mode: 'index', intersect: false } }
+    });
+  }
+  init();
+})();
+</script>
+{% endblock %}

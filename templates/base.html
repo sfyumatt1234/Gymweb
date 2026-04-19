@@ -1,0 +1,38 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Gymweb{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'tracker/styles.css' %}" />
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{% url 'tracker:dashboard' %}">Gymweb</a>
+    <nav>
+      <a href="{% url 'tracker:dashboard' %}">Dashboard</a>
+      <a href="{% url 'tracker:log' %}">Log</a>
+      <a href="{% url 'tracker:routines' %}">Routines</a>
+      <a href="{% url 'tracker:history' %}">History</a>
+      <a href="{% url 'tracker:profile' %}">Profile</a>
+    </nav>
+  </header>
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li class="msg msg-{{ message.tags|default:'info' }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <small>Local-first body composition + workout tracker. Data is stored in your MySQL database.</small>
+  </footer>
+</body>
+</html>

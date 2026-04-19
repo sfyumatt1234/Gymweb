@@ -1,0 +1,6 @@
+Django>=5.0,<6.1
+python-decouple>=3.8
+# MySQL driver. mysqlclient is preferred (compiled, fastest); PyMySQL is the
+# pure-Python fallback that "just works" without MySQL C headers.
+mysqlclient>=2.2 ; sys_platform != "win32"
+PyMySQL>=1.1

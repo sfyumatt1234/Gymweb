@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}History · Gymweb{% endblock %}
+
+{% block content %}
+<h1>Workout history</h1>
+{% if sessions %}
+{% for s in sessions %}
+  <article class="card">
+    <h2><a href="{% url 'tracker:session_detail' s.id %}">{{ s.day.program.name }} · {{ s.day.name }}</a></h2>
+    <p class="muted">
+      Started {{ s.started_at|date:"Y-m-d H:i" }}
+      {% if s.finished_at %}· Finished {{ s.finished_at|date:"Y-m-d H:i" }}{% else %}· In progress{% endif %}
+      · {{ s.sets.count }} set{{ s.sets.count|pluralize }}
+    </p>
+  </article>
+{% endfor %}
+{% else %}
+<p class="muted">No sessions yet. Start one from the Routines page.</p>
+{% endif %}
+{% endblock %}
