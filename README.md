@@ -106,8 +106,11 @@ DB_HOST=127.0.0.1
 DB_PORT=3306
 ```
 
-`mysqlclient` is preferred but needs MySQL client headers. If it can't build, the app
-automatically falls back to **PyMySQL** at runtime — installation will still succeed.
+`mysqlclient` is preferred but needs MySQL client headers. On non-Windows installs,
+pip pulls in `mysqlclient`; on Windows the requirements file skips it and the app uses
+**PyMySQL** as a drop-in instead. Django 6’s MySQL backend insists on mysqlclient 2.2.1+,
+so this repo pins **Django 5.x** until you install a matching mysqlclient on Windows
+(or use SQLite via `DB_ENGINE=sqlite`).
 
 ## Admin
 
