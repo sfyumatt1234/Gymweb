@@ -1,29 +1,29 @@
-{% load static %}<!doctype html>
-<html lang="en">
+{% load static %}{% load bilingual %}<!doctype html>
+<html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% block title %}Gymweb{% endblock %}</title>
+  <title>{% block title %}{% t "Gymweb" "健身紀錄" %}{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'tracker/styles.css' %}" />
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="{% url 'tracker:dashboard' %}">Gymweb</a>
+    <a class="brand" href="{% url 'tracker:dashboard' %}">{% t "Gymweb" "健身紀錄" %}</a>
     <nav>
-      <a href="{% url 'tracker:dashboard' %}">Dashboard</a>
-      <a href="{% url 'tracker:log' %}">Log</a>
-      <a href="{% url 'tracker:routines' %}">Routines</a>
-      <a href="{% url 'tracker:exercise_index' %}">Exercises</a>
-      <a href="{% url 'tracker:history' %}">History</a>
-      <a href="{% url 'tracker:profile' %}">Profile</a>
+      <a href="{% url 'tracker:dashboard' %}">{% t "Dashboard" "總覽" %}</a>
+      <a href="{% url 'tracker:log' %}">{% t "Log" "身體紀錄" %}</a>
+      <a href="{% url 'tracker:routines' %}">{% t "Routines" "課表" %}</a>
+      <a href="{% url 'tracker:exercise_index' %}">{% t "Exercises" "動作庫" %}</a>
+      <a href="{% url 'tracker:history' %}">{% t "History" "訓練紀錄" %}</a>
+      <a href="{% url 'tracker:profile' %}">{% t "Profile" "個人資料" %}</a>
     </nav>
   </header>
 
   {% if messages %}
     <ul class="messages">
       {% for message in messages %}
-        <li class="msg msg-{{ message.tags|default:'info' }}">{{ message }}</li>
+        <li class="msg msg-{{ message.tags|default:'info' }}">{{ message|safe }}</li>
       {% endfor %}
     </ul>
   {% endif %}
@@ -33,7 +33,7 @@
   </main>
 
   <footer class="footer">
-    <small>Local-first body composition + workout tracker. Data is stored in your MySQL database.</small>
+    <small>{% t "Local-first body composition + workout tracker. Data is stored in your MySQL database." "本機優先的體態與訓練紀錄；資料儲存在你的 MySQL 資料庫。" %}</small>
   </footer>
 </body>
 </html>

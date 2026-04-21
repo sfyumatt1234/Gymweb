@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Exercise library — Gymweb{% endblock %}
+{% load bilingual %}
+{% block title %}{% t "Exercise library — Gymweb" "動作庫 — Gymweb" %}{% endblock %}
 {% block content %}
 <section class="page-head">
-  <h1>Exercise library</h1>
+  <h1>{% t "Exercise library" "動作庫" %}</h1>
   <p class="muted">
-    Browse moves by muscle group. Thumbnails are simple icons shipped with Gymweb (not scraped from other sites).
-    For full video libraries, use official sources you have rights to embed or link.
+    {% t "Browse moves by muscle group. Thumbnails are simple icons shipped with Gymweb (not scraped from other sites)." "依肌群瀏覽動作。縮圖為本專案內建圖示（並未從其他網站抓取）。" %}
+    {% t "For full video libraries, use official sources you have rights to embed or link." "完整影片請使用你有權嵌入或連結的官方來源。" %}
   </p>
 </section>
 
@@ -15,9 +16,10 @@
   <a class="exercise-cat-card" href="{% url 'tracker:exercise_category' cat.slug %}">
     <img src="{% static cat.thumb %}" width="120" height="120" alt="" loading="lazy" />
     <div class="exercise-cat-body">
-      <h2>{{ cat.title }}</h2>
+      <h2>{{ cat.title }} <span class="zh-inline">{{ cat.title_zh }}</span></h2>
       <p class="muted tiny">{{ cat.summary|truncatewords:22 }}</p>
-      <span class="pill">{{ cat.exercises|length }} exercises</span>
+      <p class="muted tiny zh-sub">{{ cat.summary_zh|truncatewords:22 }}</p>
+      <span class="pill">{{ cat.exercises|length }} {% t "exercises" "個動作" %}</span>
     </div>
   </a>
   {% endfor %}

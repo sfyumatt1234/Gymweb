@@ -142,3 +142,43 @@ html, body {
 @media (max-width: 520px) {
   .exercise-hero { flex-direction: column; }
 }
+
+/* Bilingual: English + Traditional Chinese (並列) */
+.bilingual {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.bilingual .en-line {
+  display: block;
+  color: var(--text);
+  font-weight: 600;
+  font-size: inherit;
+}
+.bilingual .zh-line {
+  display: block;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.88em;
+}
+label .bilingual .en-line { font-weight: 600; }
+label .bilingual .zh-line { font-weight: 500; }
+th .bilingual, td .bilingual { font-size: 0.92rem; }
+h1 .bilingual .en-line { font-size: inherit; }
+h1 .bilingual .zh-line { font-size: 0.55em; font-weight: 600; margin-top: 0.15rem; }
+h2 .bilingual .zh-line { font-size: 0.85em; }
+
+.zh-inline {
+  display: inline-block;
+  margin-left: 0.35rem;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.88em;
+}
+.zh-sub {
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.exercise-cat-body h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem; }

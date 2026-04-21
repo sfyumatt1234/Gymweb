@@ -1,22 +1,23 @@
 {% extends "base.html" %}
-{% block title %}New measurement · Gymweb{% endblock %}
+{% load bilingual %}
+{% block title %}{% t "New measurement · Gymweb" "新增身體數據 · Gymweb" %}{% endblock %}
 
 {% block content %}
-<h1>New body measurement</h1>
+<h1>{% t "New body measurement" "新增身體數據" %}</h1>
 <form method="post" class="form">
   {% csrf_token %}
   {{ form.non_field_errors }}
   {% for field in form %}
     <label>
-      <span>{{ field.label }}</span>
+      <span>{{ field.label|safe }}</span>
       {{ field }}
       {% if field.help_text %}<small class="muted">{{ field.help_text }}</small>{% endif %}
       {{ field.errors }}
     </label>
   {% endfor %}
   <div class="actions">
-    <button class="btn" type="submit">Save</button>
-    <a class="btn ghost" href="{% url 'tracker:log' %}">Cancel</a>
+    <button class="btn" type="submit">{% t "Save" "儲存" %}</button>
+    <a class="btn ghost" href="{% url 'tracker:log' %}">{% t "Cancel" "取消" %}</a>
   </div>
 </form>
 {% endblock %}

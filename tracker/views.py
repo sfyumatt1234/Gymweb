@@ -7,6 +7,8 @@ import json
 from datetime import timedelta
 
 from django.contrib import messages
+
+from .i18n_ui import bilingual_line
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -57,6 +59,18 @@ def _bmi_category(bmi: float | None) -> str:
     return "Obese"
 
 
+def _bmi_category_zh(bmi: float | None) -> str:
+    if bmi is None:
+        return "—"
+    if bmi < 18.5:
+        return "過輕"
+    if bmi < 25:
+        return "正常"
+    if bmi < 30:
+        return "過重"
+    return "肥胖"
+
+
 # Dashboard ------------------------------------------------------------------
 
 def dashboard(request):
@@ -89,6 +103,7 @@ def dashboard(request):
             "latest": latest,
             "bmi": bmi,
             "bmi_category": _bmi_category(bmi),
+            "bmi_category_zh": _bmi_category_zh(bmi),
             "series_json": json.dumps(series),
             "programs": programs,
         },
@@ -103,7 +118,10 @@ def profile_edit(request):
         form = ProfileForm(request.POST, instance=profile)
         if form.is_valid():
             form.save()
-            messages.success(request, "Profile updated.")
+            messages.success(
+                request,
+                bilingual_line("Profile updated.", "個人資料已更新。"),
+            )
             return redirect("tracker:dashboard")
     else:
         form = ProfileForm(instance=profile)
@@ -138,7 +156,10 @@ def log_create(request):
             entry = form.save(commit=False)
             entry.profile = profile
             entry.save()
-            messages.success(request, "Measurement saved.")
+            messages.success(
+                request,
+                bilingual_line("Measurement saved.", "身體數據已儲存。"),
+            )
             return redirect("tracker:log")
     else:
         form = BodyLogForm(initial={"measured_at": timezone.now()})
@@ -150,7 +171,10 @@ def log_delete(request, pk: int):
     profile = _get_or_create_singleton_profile()
     entry = get_object_or_404(BodyLog, pk=pk, profile=profile)
     entry.delete()
-    messages.success(request, "Measurement deleted.")
+    messages.success(
+        request,
+        bilingual_line("Measurement deleted.", "已刪除此筆紀錄。"),
+    )
     return redirect("tracker:log")
 
 
@@ -233,9 +257,15 @@ def session_add_set(request, session_id: int):
         entry = form.save(commit=False)
         entry.session = session
         entry.save()
-        messages.success(request, "Set logged.")
+        messages.success(
+            request,
+            bilingual_line("Set logged.", "已記錄此組。"),
+        )
     else:
-        messages.error(request, "Could not save that set.")
+        messages.error(
+            request,
+            bilingual_line("Could not save that set.", "無法儲存此組，請檢查欄位。"),
+        )
     return redirect("tracker:session_detail", session_id=session.pk)
 
 
@@ -244,7 +274,10 @@ def session_finish(request, session_id: int):
     session = get_object_or_404(WorkoutSession, pk=session_id)
     session.finished_at = timezone.now()
     session.save(update_fields=["finished_at"])
-    messages.success(request, "Session finished. Good work!")
+    messages.success(
+        request,
+        bilingual_line("Session finished. Good work!", "訓練已結束，做得好！"),
+    )
     return redirect("tracker:history")
 
 

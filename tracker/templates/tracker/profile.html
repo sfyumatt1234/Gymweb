@@ -1,19 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Profile · Gymweb{% endblock %}
+{% load bilingual %}
+{% block title %}{% t "Profile · Gymweb" "個人資料 · Gymweb" %}{% endblock %}
 
 {% block content %}
-<h1>Profile</h1>
+<h1>{% t "Profile" "個人資料" %}</h1>
 <form method="post" class="form">
   {% csrf_token %}
   {% for field in form %}
     <label>
-      <span>{{ field.label }}</span>
+      <span>{{ field.label|safe }}</span>
       {{ field }}
       {{ field.errors }}
     </label>
   {% endfor %}
   <div class="actions">
-    <button class="btn" type="submit">Save profile</button>
+    <button class="btn" type="submit">{% t "Save profile" "儲存個人資料" %}</button>
   </div>
 </form>
 {% endblock %}

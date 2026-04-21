@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Routines · Gymweb{% endblock %}
+{% load bilingual %}
+{% block title %}{% t "Routines · Gymweb" "課表 · Gymweb" %}{% endblock %}
 
 {% block content %}
-<h1>Routines</h1>
+<h1>{% t "Routines" "課表" %}</h1>
 {% if programs %}
 <div class="grid">
   {% for p in programs %}
   <div class="card">
-    <h2><a href="{% url 'tracker:program_detail' p.id %}">{{ p.name }}</a>{% if p.is_default %} <span class="pill">default</span>{% endif %}</h2>
+    <h2><a href="{% url 'tracker:program_detail' p.id %}">{{ p.name }}</a>{% if p.is_default %} <span class="pill">{% t "default" "預設" %}</span>{% endif %}</h2>
     {% if p.description %}<p class="muted">{{ p.description }}</p>{% endif %}
     <ul class="plain">
       {% for d in p.days.all %}
@@ -18,6 +19,6 @@
   {% endfor %}
 </div>
 {% else %}
-<p class="muted">No programs yet. Run <code>python manage.py seed_program</code> to load the starter full-body routine.</p>
+<p class="muted">{% t "No programs yet. Run" "尚無計畫，請執行" %} <code>python manage.py seed_program</code> {% t "to load the starter full-body routine." "載入入門全身課表。" %}</p>
 {% endif %}
 {% endblock %}

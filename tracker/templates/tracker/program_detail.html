@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load bilingual %}
 {% block title %}{{ program.name }} · Gymweb{% endblock %}
 
 {% block content %}
@@ -16,7 +17,7 @@
     </ul>
     <form method="post" action="{% url 'tracker:session_start' d.id %}">
       {% csrf_token %}
-      <button class="btn" type="submit">Start this day</button>
+      <button class="btn" type="submit">{% t "Start this day" "開始這一天" %}</button>
     </form>
   </div>
   {% endfor %}

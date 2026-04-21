@@ -1,49 +1,50 @@
 {% extends "base.html" %}
-{% block title %}Dashboard · Gymweb{% endblock %}
+{% load bilingual %}
+{% block title %}{% t "Dashboard · Gymweb" "總覽 · Gymweb" %}{% endblock %}
 
 {% block content %}
 <section class="grid">
   <div class="card">
-    <h2>BMI</h2>
+    <h2>{% t "BMI" "身體質量指數（BMI）" %}</h2>
     {% if bmi %}
       <p class="big">{{ bmi }}</p>
-      <p class="muted">{{ bmi_category }} · derived from height ({{ profile.height_cm }} cm) and weight.</p>
+      <p class="muted">{% t "Category" "分級" %} · {{ bmi_category }} / {{ bmi_category_zh }} · {% t "from height" "依身高" %}（{{ profile.height_cm }} cm）{% t "and weight" "與體重" %}。</p>
     {% else %}
-      <p class="muted">Add a body measurement and your height to see BMI.</p>
+      <p class="muted">{% t "Add a body measurement and your height to see BMI." "請新增身體數據並填寫身高以顯示 BMI。" %}</p>
     {% endif %}
-    <p class="tiny">BMI is a screening number, not a body-composition measure.</p>
+    <p class="tiny">{% t "BMI is a screening number, not a body-composition measure." "BMI 僅為篩檢指標，不代表體組成。" %}</p>
   </div>
 
   <div class="card">
-    <h2>Latest body composition</h2>
+    <h2>{% t "Latest body composition" "最新身體組成" %}</h2>
     {% if latest %}
       <ul class="kv">
-        <li><span>Weight</span><b>{{ latest.weight_kg|default:"—" }} kg</b></li>
-        <li><span>Body fat</span><b>{{ latest.body_fat_pct|default:"—" }} %</b></li>
-        <li><span>Muscle</span><b>{{ latest.muscle_kg|default:"—" }} kg{% if latest.muscle_pct %} ({{ latest.muscle_pct }} %){% endif %}</b></li>
+        <li><span>{% t "Weight" "體重" %}</span><b>{{ latest.weight_kg|default:"—" }} kg</b></li>
+        <li><span>{% t "Body fat" "體脂" %}</span><b>{{ latest.body_fat_pct|default:"—" }} %</b></li>
+        <li><span>{% t "Muscle" "肌肉" %}</span><b>{{ latest.muscle_kg|default:"—" }} kg{% if latest.muscle_pct %} ({{ latest.muscle_pct }} %){% endif %}</b></li>
       </ul>
-      <p class="muted">Recorded {{ latest.measured_at|date:"Y-m-d H:i" }} · source: {{ latest.get_source_display }}</p>
+      <p class="muted">{% t "Recorded" "紀錄於" %} {{ latest.measured_at|date:"Y-m-d H:i" }} · {% t "source" "來源" %}: {{ latest.get_source_display }}</p>
     {% else %}
-      <p class="muted">No measurements yet.</p>
+      <p class="muted">{% t "No measurements yet." "尚無紀錄。" %}</p>
     {% endif %}
-    <p><a class="btn" href="{% url 'tracker:log_create' %}">Log new measurement</a></p>
+    <p><a class="btn" href="{% url 'tracker:log_create' %}">{% t "Log new measurement" "新增身體數據" %}</a></p>
   </div>
 
   <div class="card wide">
-    <h2>Last 30 days</h2>
+    <h2>{% t "Last 30 days" "近 30 天" %}</h2>
     <canvas id="trendChart" height="120"></canvas>
   </div>
 
   <div class="card wide">
-    <h2>Programs</h2>
+    <h2>{% t "Programs" "訓練計畫" %}</h2>
     {% if programs %}
       <ul class="plain">
         {% for p in programs %}
-          <li><a href="{% url 'tracker:program_detail' p.id %}">{{ p.name }}</a>{% if p.is_default %} <span class="pill">default</span>{% endif %}</li>
+          <li><a href="{% url 'tracker:program_detail' p.id %}">{{ p.name }}</a>{% if p.is_default %} <span class="pill">{% t "default" "預設" %}</span>{% endif %}</li>
         {% endfor %}
       </ul>
     {% else %}
-      <p class="muted">No programs yet. Run <code>python manage.py seed_program</code>.</p>
+      <p class="muted">{% t "No programs yet. Run" "尚無計畫，請執行" %} <code>python manage.py seed_program</code>。</p>
     {% endif %}
   </div>
 </section>
@@ -61,9 +62,9 @@
       data: {
         labels: data.labels,
         datasets: [
-          { label: 'Weight (kg)', data: data.weight, borderColor: '#2563eb', tension: .2, spanGaps: true },
-          { label: 'Body fat (%)', data: data.fat, borderColor: '#dc2626', tension: .2, spanGaps: true },
-          { label: 'Muscle (kg)', data: data.muscle_kg, borderColor: '#16a34a', tension: .2, spanGaps: true },
+          { label: 'Weight (kg) / 體重', data: data.weight, borderColor: '#2563eb', tension: .2, spanGaps: true },
+          { label: 'Body fat (%) / 體脂', data: data.fat, borderColor: '#dc2626', tension: .2, spanGaps: true },
+          { label: 'Muscle (kg) / 肌肉', data: data.muscle_kg, borderColor: '#16a34a', tension: .2, spanGaps: true },
           { label: 'BMI', data: data.bmi, borderColor: '#9333ea', tension: .2, spanGaps: true, hidden: true }
         ]
       },
