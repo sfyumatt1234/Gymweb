@@ -19,4 +19,6 @@ urlpatterns = [
     path("session/<int:session_id>/finish/", views.session_finish, name="session_finish"),
     path("session/<int:session_id>/add-set/", views.session_add_set, name="session_add_set"),
     path("history/", views.history, name="history"),
+    path("exercises/", views.exercise_index, name="exercise_index"),
+    path("exercises/<slug:slug>/", views.exercise_category, name="exercise_category"),
 ]

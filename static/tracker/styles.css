@@ -76,3 +76,69 @@ html, body {
 .msg-success { background: #0f2a1c; color: #b6f5cf; }
 .msg-error   { background: #2a0f0f; color: #f5b6b6; }
 .msg-info    { background: #0f1d2a; color: #b6d6f5; }
+
+.page-head h1 { margin: 0 0 .35rem; font-size: 1.65rem; }
+.page-head p { margin: 0; max-width: 52rem; line-height: 1.45; }
+.crumb { margin-bottom: .75rem; }
+.crumb a { color: var(--muted); }
+.crumb a:hover { color: var(--text); }
+
+.exercise-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+.exercise-cat-card {
+  display: flex; gap: 1rem; align-items: flex-start;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .15s, transform .15s;
+}
+.exercise-cat-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.exercise-cat-card img {
+  flex-shrink: 0;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+}
+.exercise-cat-body h2 { margin: 0 0 .35rem; font-size: 1.1rem; color: var(--text); }
+.exercise-cat-body .pill { margin-top: .5rem; display: inline-block; }
+
+.exercise-hero {
+  display: flex; gap: 1.25rem; align-items: flex-start;
+  margin-top: .5rem;
+}
+.exercise-hero-img {
+  flex-shrink: 0;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+}
+.exercise-list { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.25rem; }
+.exercise-card {
+  display: flex; gap: 1rem; align-items: flex-start;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+.exercise-card img {
+  flex-shrink: 0;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+}
+.exercise-card-main h2 { margin: 0 0 .35rem; font-size: 1.05rem; }
+.exercise-notes { margin: .5rem 0 0; font-size: .9rem; line-height: 1.45; color: var(--text); }
+
+@media (max-width: 520px) {
+  .exercise-hero { flex-direction: column; }
+}

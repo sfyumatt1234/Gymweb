@@ -7,11 +7,12 @@ import json
 from datetime import timedelta
 
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from .exercise_library import all_categories, get_category
 from .forms import BodyLogForm, ProfileForm, SetEntryForm
 from .models import (
     BodyLog,
@@ -253,3 +254,25 @@ def history(request):
     profile = _get_or_create_singleton_profile()
     sessions = profile.sessions.select_related("day", "day__program").prefetch_related("sets")
     return render(request, "tracker/history.html", {"sessions": sessions})
+
+
+# Exercise library (curated reference + local thumbnails) ----------------------
+
+
+def exercise_index(request):
+    return render(
+        request,
+        "tracker/exercise_index.html",
+        {"categories": all_categories()},
+    )
+
+
+def exercise_category(request, slug: str):
+    category = get_category(slug)
+    if category is None:
+        raise Http404("Unknown muscle group")
+    return render(
+        request,
+        "tracker/exercise_category.html",
+        {"category": category},
+    )

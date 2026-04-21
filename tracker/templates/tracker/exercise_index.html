@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Exercise library — Gymweb{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>Exercise library</h1>
+  <p class="muted">
+    Browse moves by muscle group. Thumbnails are simple icons shipped with Gymweb (not scraped from other sites).
+    For full video libraries, use official sources you have rights to embed or link.
+  </p>
+</section>
+
+<div class="exercise-cat-grid">
+  {% for cat in categories %}
+  <a class="exercise-cat-card" href="{% url 'tracker:exercise_category' cat.slug %}">
+    <img src="{% static cat.thumb %}" width="120" height="120" alt="" loading="lazy" />
+    <div class="exercise-cat-body">
+      <h2>{{ cat.title }}</h2>
+      <p class="muted tiny">{{ cat.summary|truncatewords:22 }}</p>
+      <span class="pill">{{ cat.exercises|length }} exercises</span>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}
