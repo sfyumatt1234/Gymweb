@@ -282,6 +282,60 @@ h2 .bilingual .zh-line { font-size: 0.85em; }
 }
 .exercise-cat-body h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem; }
 
+/* Exercise library filters (MuscleWiki-like) -------------------------------- */
+.search-row .search-field.wide { flex: 1 1 240px; min-width: 200px; }
+.exercise-filter-form { margin-top: 1rem; }
+.active-filters-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .5rem;
+  margin: .75rem 0 0;
+  padding: .55rem .75rem;
+  border-radius: 10px;
+  border: 1px dashed rgba(37,99,235,.35);
+  background: rgba(37,99,235,.06);
+}
+.filter-groups {
+  margin-top: .85rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: .75rem 1rem;
+  background: rgba(255,255,255,.02);
+}
+.filter-groups summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--text);
+  list-style: none;
+}
+.filter-groups summary::-webkit-details-marker { display: none; }
+.filter-section { margin-top: 1rem; }
+.filter-section:first-of-type { margin-top: .25rem; }
+.filter-heading {
+  margin: 0 0 .5rem;
+  font-size: .88rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+}
+.chip-grid-tall { max-height: 220px; overflow-y: auto; padding-right: .25rem; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .35rem .55rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.03);
+  font-size: .82rem;
+  cursor: pointer;
+  user-select: none;
+}
+.chip:hover { border-color: rgba(37,99,235,.45); background: rgba(37,99,235,.07); }
+.chip input { accent-color: var(--accent); }
+
 /* Body graph --------------------------------------------------------------- */
 .body-graph { display: grid; grid-template-columns: 1.3fr .7fr; gap: 1rem; align-items: start; margin-top: 1.25rem; }
 .body-graph-canvas {

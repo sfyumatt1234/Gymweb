@@ -14,6 +14,13 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from .exercise_filters import (
+    EQUIPMENT_OPTIONS,
+    MUSCLE_OPTIONS,
+    equipment_matches,
+    muscle_matches,
+    normalize_multi_param,
+)
 from .exercise_library import all_categories, get_category
 from .forms import BodyLogForm, ProfileForm, SetEntryForm
 from .models import (
@@ -293,32 +300,42 @@ def history(request):
 
 
 def exercise_index(request):
-    q = (request.GET.get("q") or "").strip().lower()
-    equipment = (request.GET.get("equipment") or "").strip().lower()
+    q_raw = request.GET.get("q") or ""
+    q = q_raw.strip().lower()
+    equipment_legacy = (request.GET.get("equipment") or "").strip().lower()
+    equip_keys = normalize_multi_param(request, "equip")
+    muscle_keys = normalize_multi_param(request, "muscle")
+
     categories = list(all_categories())
 
-    if q or equipment:
+    def exercise_passes_filters(ex, cat) -> bool:
+        hay = " ".join(
+            [
+                ex.name,
+                ex.name_zh,
+                ex.equipment,
+                ex.equipment_zh,
+                ex.primary,
+                ex.primary_zh,
+            ]
+        ).lower()
+        if q and q not in hay:
+            return False
+        if equipment_legacy and equipment_legacy not in ex.equipment.lower() and equipment_legacy not in ex.equipment_zh.lower():
+            return False
+        if equip_keys:
+            if not any(equipment_matches(ex, k) for k in equip_keys):
+                return False
+        if muscle_keys:
+            if not any(muscle_matches(ex, cat, k) for k in muscle_keys):
+                return False
+        return True
+
+    if q or equipment_legacy or equip_keys or muscle_keys:
         filtered = []
         for c in categories:
-            exs = []
-            for ex in c.exercises:
-                hay = " ".join(
-                    [
-                        ex.name,
-                        ex.name_zh,
-                        ex.equipment,
-                        ex.equipment_zh,
-                        ex.primary,
-                        ex.primary_zh,
-                    ]
-                ).lower()
-                if q and q not in hay:
-                    continue
-                if equipment and equipment not in ex.equipment.lower() and equipment not in ex.equipment_zh.lower():
-                    continue
-                exs.append(ex)
+            exs = [ex for ex in c.exercises if exercise_passes_filters(ex, c)]
             if exs:
-                # keep same category metadata, but only show matched exercises count
                 filtered.append(
                     type(c)(
                         slug=c.slug,
@@ -337,8 +354,12 @@ def exercise_index(request):
         "tracker/exercise_index.html",
         {
             "categories": categories,
-            "q": request.GET.get("q", ""),
-            "equipment": request.GET.get("equipment", ""),
+            "q": q_raw.strip(),
+            "equipment": equipment_legacy,
+            "equip_keys": equip_keys,
+            "muscle_keys": muscle_keys,
+            "equipment_options": EQUIPMENT_OPTIONS,
+            "muscle_options": MUSCLE_OPTIONS,
         },
     )
 
