@@ -8,7 +8,7 @@ This document captures integration planning for **MuscleWiki API** (`https://api
 
 ### Authentication
 
-- Every request needs header: **`X-API-Key: mw_...`**
+- Every request needs header: `**X-API-Key: mw_...`**
 - Create/manage keys in the developer dashboard: `https://api.musclewiki.com/dashboard/api-keys`
 
 ### Plans & direct API access
@@ -26,7 +26,7 @@ Per official docs / marketing pages:
 
 Some “aggregate” endpoints **count as multiple API calls**:
 
-- `/routines/{id}/full` — response includes `api_calls_cost`; header **`X-API-Calls-Cost`**
+- `/routines/{id}/full` — response includes `api_calls_cost`; header `**X-API-Calls-Cost`**
 - `/workouts/{id}/full` — same pattern
 
 **Rule of thumb**: prefer `/exercises` list + `/exercises/{id}` detail instead of `/full` unless you truly need one-shot expansion.
@@ -41,26 +41,30 @@ Streaming endpoints under `/stream/...` **still require `X-API-Key`** and **mete
 
 ### Discover metadata (cache aggressively)
 
-| Endpoint | Purpose |
-|----------|---------|
-| `GET /` | Root metadata + endpoint map |
-| `GET /health` | Health check |
-| `GET /statistics` | DB stats |
-| `GET /muscles` | Primary muscle groups + counts (build filters) |
-| `GET /categories` | Equipment categories + counts |
-| `GET /filters` | All filter values for dynamic UI |
 
-Docs suggest caching **`/muscles`, `/categories`, `/filters`** for long periods (up to ~30 days) because they change infrequently.
+| Endpoint          | Purpose                                        |
+| ----------------- | ---------------------------------------------- |
+| `GET /`           | Root metadata + endpoint map                   |
+| `GET /health`     | Health check                                   |
+| `GET /statistics` | DB stats                                       |
+| `GET /muscles`    | Primary muscle groups + counts (build filters) |
+| `GET /categories` | Equipment categories + counts                  |
+| `GET /filters`    | All filter values for dynamic UI               |
+
+
+Docs suggest caching `**/muscles`, `/categories`, `/filters`** for long periods (up to ~30 days) because they change infrequently.
 
 ### List & detail exercises
 
-| Endpoint | Purpose |
-|----------|---------|
-| `GET /exercises` | Paginated list; supports filters |
-| `GET /exercises/{id}` | Full exercise payload (steps, videos, etc.) |
-| `GET /exercises/{id}/videos` | Video URLs only (bandwidth saver) |
-| `GET /search?q=...` | Text search with relevance ranking |
-| `GET /random` | Random exercise (variation features) |
+
+| Endpoint                     | Purpose                                     |
+| ---------------------------- | ------------------------------------------- |
+| `GET /exercises`             | Paginated list; supports filters            |
+| `GET /exercises/{id}`        | Full exercise payload (steps, videos, etc.) |
+| `GET /exercises/{id}/videos` | Video URLs only (bandwidth saver)           |
+| `GET /search?q=...`          | Text search with relevance ranking          |
+| `GET /random`                | Random exercise (variation features)        |
+
 
 ### `/exercises` query parameters (high-signal)
 
@@ -70,7 +74,7 @@ Documented filters include:
 - `search` (min 2 chars)
 - `gender` for videos (`male` / `female`)
 - `category` equipment (`barbell`, `dumbbell`, `bodyweight`, …)
-- **`muscles`** — muscle group filter (examples show values like “Chest”, “Biceps”)
+- `**muscles**` — muscle group filter (examples show values like “Chest”, “Biceps”)
 - `difficulty` (`novice`, `intermediate`, `advanced`, …)
 - `force` (`push`, `pull`, `static`)
 - `mechanic` (`isolation`, `compound`)
@@ -78,11 +82,13 @@ Documented filters include:
 
 ### Routines / workouts (optional)
 
-| Endpoint | Purpose |
-|----------|---------|
-| `GET /routines` | Browse programs |
-| `GET /workouts` | Browse workouts (can filter by goal/equipment/muscles) |
-| `GET /workouts/{id}` | Workout details w/ prescriptions |
+
+| Endpoint             | Purpose                                                |
+| -------------------- | ------------------------------------------------------ |
+| `GET /routines`      | Browse programs                                        |
+| `GET /workouts`      | Browse workouts (can filter by goal/equipment/muscles) |
+| `GET /workouts/{id}` | Workout details w/ prescriptions                       |
+
 
 These are useful for “Workout results” pages similar to MuscleWiki’s generated plans, but watch **quota cost** especially for `*/full`.
 
@@ -99,13 +105,15 @@ These are useful for “Workout results” pages similar to MuscleWiki’s gener
 
 Because “Legs” may split into **Quads / Hamstrings / Glutes / Calves**, maintain a mapping table in code or DB:
 
-| UI bucket | Example API `muscles=` values (illustrative; verify via `/muscles`) |
-|-----------|----------------------------------------------------------------------|
-| Chest | `Chest` |
-| Back | `Lats`, `Upper Back`, `Lower Back`, … |
-| Legs | `Quads`, `Hamstrings`, `Glutes`, `Calves`, … |
-| Abs / core | `Abs`, `Obliques`, … |
-| Other | everything else bucketed (arms, shoulders, cardio tags, etc.) |
+
+| UI bucket  | Example API `muscles=` values (illustrative; verify via `/muscles`) |
+| ---------- | ------------------------------------------------------------------- |
+| Chest      | `Chest`                                                             |
+| Back       | `Lats`, `Upper Back`, `Lower Back`, …                               |
+| Legs       | `Quads`, `Hamstrings`, `Glutes`, `Calves`, …                        |
+| Abs / core | `Abs`, `Obliques`, …                                                |
+| Other      | everything else bucketed (arms, shoulders, cardio tags, etc.)       |
+
 
 ### Step C — pagination for each bucket
 
@@ -190,3 +198,4 @@ Never commit real keys; use `.env.local` / deployment secrets.
 - API docs: `https://api.musclewiki.com/documentation`
 - OpenAPI (from root `GET /`): `GET https://api.musclewiki.com/openapi.json`
 - Terms (pricing channels): `https://api.musclewiki.com/api-terms`
+
