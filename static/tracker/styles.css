@@ -285,44 +285,36 @@ h2 .bilingual .zh-line { font-size: 0.85em; }
 /* Body graph --------------------------------------------------------------- */
 .body-graph { display: grid; grid-template-columns: 1.3fr .7fr; gap: 1rem; align-items: start; margin-top: 1.25rem; }
 .body-graph-canvas {
-  background: radial-gradient(1200px 500px at 30% 10%, rgba(37,99,235,.15), transparent 55%),
-              radial-gradient(900px 420px at 70% 90%, rgba(22,163,74,.10), transparent 55%),
-              var(--panel);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(148,163,184,0.28);
   border-radius: 16px;
-  padding: 1.25rem;
+  padding: 1rem;
   box-shadow: var(--shadow);
-  min-height: 520px;
+  min-height: 480px;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
 }
-.figure {
-  position: relative;
-  margin: 0 auto;
-  width: min(520px, 100%);
-  aspect-ratio: 1 / 1;
-  border-radius: 18px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0));
-  border: 1px dashed rgba(37,48,74,.85);
+.mw-body-graph-canvas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.muscle {
-  position: absolute;
-  border-radius: 14px;
-  border: 1px solid rgba(37,99,235,.35);
-  background: rgba(37,99,235,.12);
-  cursor: pointer;
-  transition: transform .12s, filter .12s, background .12s, border-color .12s;
+.mw-body-svg {
+  width: 100%;
+  max-width: 640px;
+  height: auto;
+  display: block;
 }
-.muscle:hover { transform: translateY(-1px) scale(1.01); filter: brightness(1.07); border-color: rgba(37,99,235,.65); }
-.muscle:focus { outline: 2px solid rgba(37,99,235,.75); outline-offset: 2px; }
-
-/* Rough clickable regions */
-.m-chest { left: 39%; top: 22%; width: 22%; height: 14%; }
-.m-back { left: 39%; top: 40%; width: 22%; height: 16%; background: rgba(22,163,74,.12); border-color: rgba(22,163,74,.35); }
-.m-shoulders { left: 30%; top: 18%; width: 40%; height: 10%; }
-.m-arms { left: 22%; top: 28%; width: 56%; height: 10%; }
-.m-legs { left: 38%; top: 60%; width: 24%; height: 26%; }
-.m-core { left: 40%; top: 30%; width: 20%; height: 10%; }
-.m-abductors { left: 34%; top: 56%; width: 32%; height: 8%; }
+.mw-region {
+  transition: opacity .15s, filter .15s, stroke-width .15s;
+}
+.mw-region:hover {
+  filter: brightness(1.12) saturate(1.08);
+  opacity: 1;
+}
+.mw-region:focus {
+  outline: none;
+  filter: brightness(1.18);
+  stroke-width: 2px;
+}
 
 .body-graph-panel { position: sticky; top: 88px; }
 .body-graph-list { display: flex; flex-direction: column; gap: .5rem; margin-top: .75rem; }
