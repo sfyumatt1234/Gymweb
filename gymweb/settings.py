@@ -63,6 +63,17 @@ ALLOWED_HOSTS = _cfg(
 if "test.gigxmatch.com" not in ALLOWED_HOSTS:
     ALLOWED_HOSTS = list(ALLOWED_HOSTS) + ["test.gigxmatch.com"]
 
+CSRF_TRUSTED_ORIGINS = _cfg(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    "CSRF_TRUSTED_ORIGINS",
+    default=(
+        "http://127.0.0.1:5174,"
+        "http://localhost:5174,"
+        "http://test.gigxmatch.com:5174"
+    ),
+    cast=Csv(),
+)
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
