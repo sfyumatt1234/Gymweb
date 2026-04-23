@@ -8,32 +8,69 @@
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="{% url 'tracker:dashboard' %}">{% t "Gymweb" "健身紀錄" %}</a>
-    <nav>
-      <a href="{% url 'tracker:dashboard' %}">{% t "Dashboard" "總覽" %}</a>
-      <a href="{% url 'tracker:log' %}">{% t "Log" "身體紀錄" %}</a>
-      <a href="{% url 'tracker:routines' %}">{% t "Routines" "課表" %}</a>
-      <a href="{% url 'tracker:exercise_index' %}">{% t "Exercises" "動作庫" %}</a>
-      <a href="{% url 'tracker:history' %}">{% t "History" "訓練紀錄" %}</a>
-      <a href="{% url 'tracker:profile' %}">{% t "Profile" "個人資料" %}</a>
-    </nav>
-  </header>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Primary">
+      <a class="sidebar-brand" href="{% url 'tracker:dashboard' %}">
+        <span class="logo-mark">G</span>
+        <span class="logo-text">{% t "Gymweb" "健身紀錄" %}</span>
+      </a>
 
-  {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-        <li class="msg msg-{{ message.tags|default:'info' }}">{{ message|safe }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+      <nav class="side-nav">
+        <a class="side-link" href="{% url 'tracker:dashboard' %}">{% t "Home" "首頁" %}</a>
+        <a class="side-link" href="{% url 'tracker:exercise_index' %}">{% t "Exercises" "動作庫" %}</a>
+        <a class="side-link" href="{% url 'tracker:planning' %}">{% t "Planning" "規劃" %}</a>
+        <a class="side-link" href="{% url 'tracker:schedule' %}">{% t "Schedule" "排程" %}</a>
+        <a class="side-link" href="{% url 'tracker:tools' %}">{% t "Tools" "工具" %}</a>
+        <a class="side-link" href="{% url 'tracker:body_graph' %}">{% t "Body graph" "身體圖" %}</a>
 
-  <main class="container">
-    {% block content %}{% endblock %}
-  </main>
+        <div class="side-sep"></div>
 
-  <footer class="footer">
-    <small>{% t "Local-first body composition + workout tracker. Data is stored in your MySQL database." "本機優先的體態與訓練紀錄；資料儲存在你的 MySQL 資料庫。" %}</small>
-  </footer>
+        <a class="side-link" href="{% url 'tracker:log' %}">{% t "Body log" "身體紀錄" %}</a>
+        <a class="side-link" href="{% url 'tracker:routines' %}">{% t "Routines" "課表" %}</a>
+        <a class="side-link" href="{% url 'tracker:history' %}">{% t "History" "訓練紀錄" %}</a>
+        <a class="side-link" href="{% url 'tracker:profile' %}">{% t "Profile" "個人資料" %}</a>
+      </nav>
+
+      <div class="side-foot">
+        <div class="tiny muted">{% t "Local-first" "本機優先" %}</div>
+        <div class="tiny muted">{% t "No account required" "不需登入" %}</div>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="topbar">
+        <button class="icon-btn" type="button" data-sidebar-toggle aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-title">{% block topbar_title %}{% endblock %}</div>
+        <div class="topbar-spacer"></div>
+        <a class="topbar-pill" href="{% url 'tracker:exercise_index' %}">{% t "Browse exercises" "瀏覽動作" %}</a>
+      </header>
+
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+            <li class="msg msg-{{ message.tags|default:'info' }}">{{ message|safe }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <main class="container">
+        {% block content %}{% endblock %}
+      </main>
+
+      <footer class="footer">
+        <small>{% t "Local-first body composition + workout tracker. Data is stored in your MySQL database." "本機優先的體態與訓練紀錄；資料儲存在你的 MySQL 資料庫。" %}</small>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var btn = document.querySelector('[data-sidebar-toggle]');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      document.documentElement.classList.toggle('sidebar-collapsed');
+    });
+  })();
+  </script>
 </body>
 </html>

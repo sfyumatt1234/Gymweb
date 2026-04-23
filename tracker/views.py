@@ -293,10 +293,53 @@ def history(request):
 
 
 def exercise_index(request):
+    q = (request.GET.get("q") or "").strip().lower()
+    equipment = (request.GET.get("equipment") or "").strip().lower()
+    categories = list(all_categories())
+
+    if q or equipment:
+        filtered = []
+        for c in categories:
+            exs = []
+            for ex in c.exercises:
+                hay = " ".join(
+                    [
+                        ex.name,
+                        ex.name_zh,
+                        ex.equipment,
+                        ex.equipment_zh,
+                        ex.primary,
+                        ex.primary_zh,
+                    ]
+                ).lower()
+                if q and q not in hay:
+                    continue
+                if equipment and equipment not in ex.equipment.lower() and equipment not in ex.equipment_zh.lower():
+                    continue
+                exs.append(ex)
+            if exs:
+                # keep same category metadata, but only show matched exercises count
+                filtered.append(
+                    type(c)(
+                        slug=c.slug,
+                        title=c.title,
+                        title_zh=c.title_zh,
+                        summary=c.summary,
+                        summary_zh=c.summary_zh,
+                        exercises=tuple(exs),
+                        thumb=c.thumb,
+                    )
+                )
+        categories = filtered
+
     return render(
         request,
         "tracker/exercise_index.html",
-        {"categories": all_categories()},
+        {
+            "categories": categories,
+            "q": request.GET.get("q", ""),
+            "equipment": request.GET.get("equipment", ""),
+        },
     )
 
 
@@ -309,3 +352,22 @@ def exercise_category(request, slug: str):
         "tracker/exercise_category.html",
         {"category": category},
     )
+
+
+# MuscleWiki-like navigation stubs -------------------------------------------
+
+
+def planning(request):
+    return render(request, "tracker/planning.html")
+
+
+def schedule(request):
+    return render(request, "tracker/schedule.html")
+
+
+def tools(request):
+    return render(request, "tracker/tools.html")
+
+
+def body_graph(request):
+    return render(request, "tracker/body_graph.html", {"categories": all_categories()})

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load bilingual %}
+{% block title %}{% t "Body graph · Gymweb" "身體圖 · Gymweb" %}{% endblock %}
+{% block topbar_title %}{% t "Body graph" "身體圖" %}{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>{% t "Body graph" "身體圖" %}</h1>
+  <p class="muted">
+    {% t "This is a first-pass interactive mock. Click a muscle group to jump to its exercise list." "這是第一版互動雛形；點選肌群可跳到對應動作清單。" %}
+  </p>
+</section>
+
+<div class="body-graph">
+  <div class="body-graph-canvas" aria-hidden="true">
+    <div class="figure">
+      <div class="muscle m-chest" data-target="chest"></div>
+      <div class="muscle m-back" data-target="back"></div>
+      <div class="muscle m-shoulders" data-target="shoulders"></div>
+      <div class="muscle m-arms" data-target="arms"></div>
+      <div class="muscle m-legs" data-target="legs"></div>
+      <div class="muscle m-core" data-target="core"></div>
+      <div class="muscle m-abductors" data-target="abductors"></div>
+    </div>
+  </div>
+
+  <aside class="body-graph-panel card">
+    <h2>{% t "Muscle groups" "肌群" %}</h2>
+    <p class="muted tiny">{% t "Pick one to browse exercises." "選擇肌群以瀏覽動作。" %}</p>
+    <div class="body-graph-list">
+      {% for c in categories %}
+        <a class="body-graph-item" href="{% url 'tracker:exercise_category' c.slug %}">
+          <span class="body-graph-item-title">{{ c.title }}</span>
+          <span class="zh-inline">{{ c.title_zh }}</span>
+          <span class="pill">{{ c.exercises|length }}</span>
+        </a>
+      {% endfor %}
+    </div>
+  </aside>
+</div>
+
+<script>
+  (function () {
+    var nodes = document.querySelectorAll('.muscle[data-target]');
+    nodes.forEach(function (n) {
+      n.addEventListener('click', function () {
+        var slug = n.getAttribute('data-target');
+        if (!slug) return;
+        window.location.href = '/exercises/' + slug + '/';
+      });
+      n.setAttribute('role', 'button');
+      n.setAttribute('tabindex', '0');
+      n.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') n.click();
+      });
+    });
+  })();
+</script>
+{% endblock %}
+

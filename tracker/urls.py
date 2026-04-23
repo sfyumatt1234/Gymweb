@@ -6,6 +6,10 @@ app_name = "tracker"
 
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
+    path("planning/", views.planning, name="planning"),
+    path("schedule/", views.schedule, name="schedule"),
+    path("tools/", views.tools, name="tools"),
+    path("body-graph/", views.body_graph, name="body_graph"),
     path("log/", views.log_list, name="log"),
     path("log/new/", views.log_create, name="log_create"),
     path("log/<int:pk>/delete/", views.log_delete, name="log_delete"),

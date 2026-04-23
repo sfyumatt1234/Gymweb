@@ -2,6 +2,7 @@
 {% load static %}
 {% load bilingual %}
 {% block title %}{% t "Exercise library — Gymweb" "動作庫 — Gymweb" %}{% endblock %}
+{% block topbar_title %}{% t "Exercises" "動作庫" %}{% endblock %}
 {% block content %}
 <section class="page-head">
   <h1>{% t "Exercise library" "動作庫" %}</h1>
@@ -10,6 +11,21 @@
     {% t "For full video libraries, use official sources you have rights to embed or link." "完整影片請使用你有權嵌入或連結的官方來源。" %}
   </p>
 </section>
+
+<form class="search-row" method="get" action="{% url 'tracker:exercise_index' %}">
+  <label class="search-field">
+    <span class="tiny muted">{% t "Search" "搜尋" %}</span>
+    <input class="input" type="text" name="q" value="{{ q|default:'' }}" placeholder="bench / 卧推 / 外展…" />
+  </label>
+  <label class="search-field">
+    <span class="tiny muted">{% t "Equipment" "器材" %}</span>
+    <input class="input" type="text" name="equipment" value="{{ equipment|default:'' }}" placeholder="cable / 滑輪 / 啞鈴…" />
+  </label>
+  <div class="search-actions">
+    <button class="btn" type="submit">{% t "Filter" "篩選" %}</button>
+    <a class="btn ghost" href="{% url 'tracker:exercise_index' %}">{% t "Reset" "重置" %}</a>
+  </div>
+</form>
 
 <div class="exercise-cat-grid">
   {% for cat in categories %}

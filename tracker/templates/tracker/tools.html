@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load bilingual %}
+{% block title %}{% t "Tools — Gymweb" "工具 — Gymweb" %}{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>{% t "Tools" "工具" %}</h1>
+  <p class="muted">
+    {% t "Quick calculators and exports. More coming next." "快速計算與匯出功能，之後會補齊更多工具。" %}
+  </p>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <h2>{% t "BMI" "BMI" %}</h2>
+    <p class="muted tiny">{% t "Shown on Dashboard from your latest log + height." "會依你的最新身體紀錄與身高自動計算並顯示在總覽。" %}</p>
+    <a class="btn ghost" href="{% url 'tracker:dashboard' %}">{% t "Go to Dashboard" "前往總覽" %}</a>
+  </div>
+
+  <div class="card">
+    <h2>{% t "Export body logs" "匯出身體紀錄" %}</h2>
+    <p class="muted tiny">{% t "Download your measurements as CSV." "將身體數據下載為 CSV。" %}</p>
+    <a class="btn" href="{% url 'tracker:log_export' %}">{% t "Export CSV" "匯出 CSV" %}</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load bilingual %}
+{% block title %}{% t "Planning — Gymweb" "規劃 — Gymweb" %}{% endblock %}
+{% block topbar_title %}{% t "Planning" "規劃" %}{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>{% t "Planning" "規劃" %}</h1>
+  <p class="muted">{% t "Pick a goal and let Gymweb suggest a routine structure. (Scaffold)" "選擇目標，讓系統建議課表結構。（雛形）" %}</p>
+</section>
+
+<div class="grid">
+  <div class="card">
+    <h2>{% t "Goal" "目標" %}</h2>
+    <ul class="plain">
+      <li>{% t "Build muscle" "增肌" %}</li>
+      <li>{% t "Lose fat" "減脂" %}</li>
+      <li>{% t "Strength" "力量" %}</li>
+    </ul>
+    <p class="tiny muted">{% t "Next: wire this to program generator + equipment constraints." "下一步：接上課表生成 + 器材限制。 " %}</p>
+  </div>
+  <div class="card">
+    <h2>{% t "Equipment filters" "器材篩選" %}</h2>
+    <p class="muted">{% t "Technogym / Hammer Strength / free weights etc." "Technogym／Hammer Strength／自由重量等。" %}</p>
+    <p class="tiny muted">{% t "Scaffold only (UI + data model to follow)." "目前先提供頁面雛形（之後補資料結構）。" %}</p>
+  </div>
+</div>
+{% endblock %}
