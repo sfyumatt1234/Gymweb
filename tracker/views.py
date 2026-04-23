@@ -358,7 +358,71 @@ def exercise_category(request, slug: str):
 
 
 def planning(request):
-    return render(request, "tracker/planning.html")
+    categories = list(all_categories())
+    return render(
+        request,
+        "tracker/planning.html",
+        {"categories": categories},
+    )
+
+
+def planning_results(request):
+    goal = (request.GET.get("goal") or "gain").strip().lower()
+    level = (request.GET.get("level") or "beginner").strip().lower()
+    focus = (request.GET.get("focus") or "chest").strip().lower()
+    equipment = (request.GET.get("equipment") or "").strip()
+
+    cat = get_category(focus) or get_category("chest")
+    assert cat is not None
+
+    # Very simple generator: pick the first N exercises from the category and
+    # attach sets/reps based on goal + level.
+    if goal in ("strength",):
+        rep_scheme = "3–5"
+        sets = 4 if level in ("intermediate", "advanced") else 3
+        rest = "2–4 min"
+    elif goal in ("lose", "fatloss", "cut"):
+        rep_scheme = "10–15"
+        sets = 3
+        rest = "60–90s"
+    else:  # gain muscle
+        rep_scheme = "8–12"
+        sets = 3 if level == "beginner" else 4
+        rest = "90–150s"
+
+    items = []
+    for ex in cat.exercises[:6]:
+        items.append(
+            {
+                "name": ex.name,
+                "name_zh": ex.name_zh,
+                "equipment": ex.equipment,
+                "equipment_zh": ex.equipment_zh,
+                "thumb": ex.thumb,
+                "sets": sets,
+                "reps": rep_scheme,
+                "rest": rest,
+                "primary": ex.primary,
+                "primary_zh": ex.primary_zh,
+            }
+        )
+
+    # Coverage is a lightweight proxy; later we can compute real coverage.
+    coverage = min(92, 44 + len(items) * 6)
+    summary = {
+        "coverage": coverage,
+        "muscle_groups": 1,
+        "goal": goal,
+        "level": level,
+        "focus": cat,
+        "equipment": equipment,
+    }
+
+    return render(
+        request,
+        "tracker/planning_results.html",
+        {"items": items, "summary": summary},
+    )
 
 
 def schedule(request):

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+{% load bilingual %}
+{% block title %}{% t "Workout results · Gymweb" "訓練結果 · Gymweb" %}{% endblock %}
+{% block topbar_title %}{% t "Workout results" "訓練結果" %}{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>{{ plan_title }}</h1>
+  <p class="muted">{{ plan_subtitle }}</p>
+</section>
+
+<div class="results-layout">
+  <section class="results-main">
+    {% for item in items %}
+    <article class="result-card">
+      <div class="result-media">
+        <img src="{% static item.thumb %}" alt="" width="260" height="170" loading="lazy" />
+      </div>
+      <div class="result-body">
+        <div class="result-head">
+          <div>
+            <h2>{{ item.name }} <span class="zh-inline">{{ item.name_zh }}</span></h2>
+            <p class="muted tiny">{{ item.equipment }} · {{ item.equipment_zh }}</p>
+          </div>
+          <a class="icon-btn" href="{% url 'tracker:exercise_category' item.category_slug %}" title="Browse category">↗</a>
+        </div>
+        <div class="result-grid">
+          <div class="result-metric">
+            <div class="tiny muted">{% t "SETS" "組數" %}</div>
+            <div class="metric-value">{{ item.sets }}</div>
+          </div>
+          <div class="result-metric">
+            <div class="tiny muted">{% t "REPS" "次數" %}</div>
+            <div class="metric-value">{{ item.reps }}</div>
+          </div>
+          <div class="result-metric">
+            <div class="tiny muted">{% t "REST" "休息" %}</div>
+            <div class="metric-value">{{ item.rest }}</div>
+          </div>
+          <div class="result-metric wide">
+            <div class="tiny muted">{% t "TARGET" "目標" %}</div>
+            <div class="metric-value">{{ item.primary }} <span class="zh-inline">{{ item.primary_zh }}</span></div>
+          </div>
+        </div>
+        <p class="result-notes">{{ item.notes }}</p>
+        <p class="result-notes zh-sub">{{ item.notes_zh }}</p>
+      </div>
+    </article>
+    {% empty %}
+      <div class="card">
+        <p class="muted">{% t "No exercises matched your filters." "沒有符合你篩選條件的動作。" %}</p>
+        <a class="btn" href="{% url 'tracker:planning' %}">{% t "Back to planning" "回到規劃" %}</a>
+      </div>
+    {% endfor %}
+  </section>
+
+  <aside class="results-side">
+    <div class="card">
+      <h2>{% t "Workout summary" "訓練摘要" %}</h2>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="tiny muted">{% t "Goal" "目標" %}</div>
+          <div><b>{{ goal_label }}</b></div>
+        </div>
+        <div class="summary-item">
+          <div class="tiny muted">{% t "Level" "等級" %}</div>
+          <div><b>{{ level_label }}</b></div>
+        </div>
+        <div class="summary-item">
+          <div class="tiny muted">{% t "Exercises" "動作數" %}</div>
+          <div><b>{{ exercise_count }}</b></div>
+        </div>
+        <div class="summary-item">
+          <div class="tiny muted">{% t "Muscle groups" "肌群數" %}</div>
+          <div><b>{{ muscle_group_count }}</b></div>
+        </div>
+      </div>
+
+      <div class="coverage">
+        <div class="tiny muted">{% t "Coverage" "覆蓋率" %}</div>
+        <div class="coverage-bar" role="progressbar" aria-valuenow="{{ coverage_pct }}" aria-valuemin="0" aria-valuemax="100">
+          <div class="coverage-fill" style="width: {{ coverage_pct }}%"></div>
+        </div>
+        <div class="tiny muted">{{ coverage_pct }}%</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>{% t "Targeted muscles" "目標肌群" %}</h2>
+      <div class="body-mini">
+        <div class="body-mini-fig">
+          {% for slug in targeted_slugs %}
+            <div class="body-mini-dot" data-muscle="{{ slug }}" title="{{ slug }}"></div>
+          {% endfor %}
+        </div>
+        <div class="body-mini-list">
+          {% for c in targeted_categories %}
+            <a class="body-graph-item" href="{% url 'tracker:exercise_category' c.slug %}">
+              <span class="body-graph-item-title">{{ c.title }}</span>
+              <span class="zh-inline">{{ c.title_zh }}</span>
+              <span class="pill">{{ c.exercises|length }}</span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+      <p class="tiny muted">{% t "Tip: adjust equipment filters to match your gym." "提示：可用器材篩選來貼近你健身房設備。" %}</p>
+    </div>
+  </aside>
+</div>
+{% endblock %}
+

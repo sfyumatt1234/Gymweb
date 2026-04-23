@@ -344,3 +344,80 @@ h2 .bilingual .zh-line { font-size: 0.85em; }
   .body-graph-panel { position: static; }
   .body-graph-canvas { min-height: 420px; }
 }
+
+/* Workout results (MuscleWiki-like) ---------------------------------------- */
+.results-layout { display: grid; grid-template-columns: 1fr 360px; gap: 1rem; align-items: start; margin-top: 1.25rem; }
+.results-main { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+.results-side { display: flex; flex-direction: column; gap: 1rem; position: sticky; top: 88px; align-self: start; }
+
+.result-card {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.result-media { background: rgba(255,255,255,.02); }
+.result-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.result-body { padding: 1rem 1.1rem; min-width: 0; }
+.result-head { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; }
+.result-head h2 { margin: 0 0 .25rem; font-size: 1.15rem; }
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .6rem;
+  margin-top: .75rem;
+}
+.result-metric {
+  border: 1px solid rgba(37,48,74,.9);
+  background: rgba(255,255,255,.02);
+  border-radius: 12px;
+  padding: .6rem .7rem;
+}
+.result-metric.wide { grid-column: 1 / -1; }
+.metric-value { font-weight: 900; letter-spacing: .2px; margin-top: .25rem; }
+.result-notes { margin: .75rem 0 0; }
+
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: .75rem; }
+.summary-item b { font-size: 1.05rem; }
+.coverage { margin-top: 1rem; }
+.coverage-bar { height: 10px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.03); overflow: hidden; margin: .35rem 0; }
+.coverage-fill { height: 100%; background: linear-gradient(90deg, rgba(22,163,74,.9), rgba(37,99,235,.9)); }
+
+.body-mini { display: grid; grid-template-columns: 120px 1fr; gap: .8rem; margin-top: .75rem; align-items: start; }
+.body-mini-fig {
+  position: relative;
+  border-radius: 14px;
+  border: 1px dashed rgba(37,48,74,.85);
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0));
+  aspect-ratio: 3 / 4;
+}
+.body-mini-dot {
+  position: absolute;
+  width: 16px; height: 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(37,99,235,.55);
+  background: rgba(37,99,235,.25);
+  box-shadow: 0 8px 16px rgba(0,0,0,.25);
+}
+/* place dots roughly by category */
+.body-mini-dot[data-muscle="chest"] { left: 52%; top: 26%; }
+.body-mini-dot[data-muscle="back"] { left: 52%; top: 36%; background: rgba(22,163,74,.25); border-color: rgba(22,163,74,.55); }
+.body-mini-dot[data-muscle="shoulders"] { left: 64%; top: 22%; }
+.body-mini-dot[data-muscle="arms"] { left: 76%; top: 30%; }
+.body-mini-dot[data-muscle="legs"] { left: 56%; top: 62%; }
+.body-mini-dot[data-muscle="core"] { left: 52%; top: 44%; }
+.body-mini-dot[data-muscle="abductors"] { left: 40%; top: 58%; }
+
+@media (max-width: 1080px) {
+  .results-layout { grid-template-columns: 1fr; }
+  .results-side { position: static; }
+}
+@media (max-width: 760px) {
+  .result-card { grid-template-columns: 1fr; }
+  .result-grid { grid-template-columns: 1fr 1fr; }
+  .body-mini { grid-template-columns: 1fr; }
+}
