@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load bilingual %}
-{% block title %}{{ category.title }} / {{ category.title_zh }} — Gymweb{% endblock %}
+{% block title %}{{ category.title }} / {{ category.title_zh }} — GymWeb{% endblock %}
 {% block content %}
 <nav class="crumb muted tiny">
   <a href="{% url 'tracker:exercise_index' %}">{% t "Exercises" "動作庫" %}</a>

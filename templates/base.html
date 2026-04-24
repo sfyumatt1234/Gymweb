@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% block title %}{% t "Gymweb" "健身紀錄" %}{% endblock %}</title>
+  <title>{% block title %}GymWeb{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'tracker/styles.css' %}" />
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
@@ -12,7 +12,7 @@
     <aside class="sidebar" aria-label="Primary">
       <a class="sidebar-brand" href="{% url 'tracker:dashboard' %}">
         <span class="logo-mark">G</span>
-        <span class="logo-text">{% t "Gymweb" "健身紀錄" %}</span>
+        <span class="logo-text">GymWeb</span>
       </a>
 
       <nav class="side-nav">
