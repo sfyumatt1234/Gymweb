@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load bilingual %}
+{% block title %}{% t "Schedule — GymWeb" "排程 — GymWeb" %}{% endblock %}
+{% block topbar_title %}{% t "Schedule" "排程" %}{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>{% t "Schedule" "排程" %}</h1>
+  <p class="muted">{% t "A weekly calendar view (stub)." "每週行事曆視圖（雛形）。" %}</p>
+</section>
+
+<div class="grid">
+  <div class="card wide">
+    <h2>{% t "Week" "本週" %}</h2>
+    <p class="muted">
+      {% t "Next: show planned sessions, completed sessions, and drag/drop rescheduling." "下一步：顯示規劃訓練、已完成訓練，並支援拖曳調整日期。" %}
+    </p>
+  </div>
+</div>
+{% endblock %}

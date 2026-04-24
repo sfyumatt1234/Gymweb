@@ -1,0 +1,30 @@
+---
+description: Core Gymweb agent workflow and validation guidance
+alwaysApply: true
+---
+
+# Gymweb Agent Guidance
+
+- This is a Django project with the main app in `tracker/` and project settings in `gymweb/`.
+- Prefer small, targeted changes and avoid editing unrelated files.
+- Preserve the dev server port: `5174`.
+
+## Setup and run
+
+- On Windows, prefer `start_server.bat`.
+- `start_server.bat` creates `.venv`, installs dependencies, loads `.env.local` first and then `.env`, runs migrations, seeds the default program, and starts the server.
+- For macOS/Linux or manual setup, use: create `.venv`, `pip install -r requirements.txt`, `python manage.py migrate`, `python manage.py seed_program`, `python manage.py runserver 127.0.0.1:5174`.
+
+## Environment
+
+- Prefer `.env.local` for local overrides.
+- Use `.env.example` as the template.
+- Supported env names include both `DJANGO_*` and short names like `DEBUG` and `SECRET_KEY`.
+- Default DB is MySQL. If MySQL is unavailable, set `DB_ENGINE=sqlite` instead of blocking on DB setup.
+- Never commit secrets from `.env` or `.env.local`.
+
+## Validation
+
+- Run `python manage.py test` after code changes when relevant.
+- Automated coverage is currently minimal, so also sanity-check affected pages in the browser when changing views, templates, forms, or routes.
+- If schema changes are made, run migrations and verify they apply cleanly.

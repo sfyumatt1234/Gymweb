@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load bilingual %}
+{% block title %}{{ program.name }} · GymWeb{% endblock %}
+
+{% block content %}
+<h1>{{ program.name }}</h1>
+{% if program.description %}<p class="muted">{{ program.description }}</p>{% endif %}
+
+<div class="grid">
+  {% for d in program.days.all %}
+  <div class="card">
+    <h2><a href="{% url 'tracker:day_detail' d.id %}">{{ d.name }}</a></h2>
+    <ul class="plain">
+      {% for ex in d.exercises.all %}
+        <li>{{ ex.name }} — {{ ex.target_sets }} × {{ ex.target_reps }}</li>
+      {% endfor %}
+    </ul>
+    <form method="post" action="{% url 'tracker:session_start' d.id %}">
+      {% csrf_token %}
+      <button class="btn" type="submit">{% t "Start this day" "開始這一天" %}</button>
+    </form>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

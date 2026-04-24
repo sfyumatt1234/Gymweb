@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load bilingual %}
+{% block title %}{% t "Log · GymWeb" "身體紀錄 · GymWeb" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <h1>{% t "Body log" "身體紀錄" %}</h1>
+  <div class="actions">
+    <a class="btn" href="{% url 'tracker:log_create' %}">{% t "+ New measurement" "＋ 新增紀錄" %}</a>
+    <a class="btn ghost" href="{% url 'tracker:log_export' %}">{% t "Export CSV" "匯出 CSV" %}</a>
+  </div>
+</div>
+
+{% if entries %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>{% t "When" "時間" %}</th>
+      <th>{% t "Weight (kg)" "體重（公斤）" %}</th>
+      <th>{% t "Body fat (%)" "體脂（%）" %}</th>
+      <th>{% t "Muscle (kg)" "肌肉（公斤）" %}</th>
+      <th>BMI</th>
+      <th>{% t "Source" "來源" %}</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in entries %}
+    <tr>
+      <td>{{ e.log.measured_at|date:"Y-m-d H:i" }}</td>
+      <td>{{ e.log.weight_kg|default:"—" }}</td>
+      <td>{{ e.log.body_fat_pct|default:"—" }}</td>
+      <td>{{ e.log.muscle_kg|default:"—" }}</td>
+      <td>{{ e.bmi|default:"—" }}</td>
+      <td>{{ e.log.get_source_display }}</td>
+      <td>
+        <form method="post" action="{% url 'tracker:log_delete' e.log.id %}" onsubmit="return confirm('Delete this entry? / 確定刪除此筆？');">
+          {% csrf_token %}
+          <button class="btn danger" type="submit">{% t "Delete" "刪除" %}</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">{% t "No measurements yet. Add your first one to start tracking trends." "尚無紀錄，新增第一筆即可開始追蹤趨勢。" %}</p>
+{% endif %}
+{% endblock %}

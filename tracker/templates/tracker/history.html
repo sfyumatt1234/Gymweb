@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load bilingual %}
+{% block title %}{% t "History · GymWeb" "訓練紀錄 · GymWeb" %}{% endblock %}
+
+{% block content %}
+<h1>{% t "Workout history" "訓練紀錄" %}</h1>
+{% if sessions %}
+{% for s in sessions %}
+  <article class="card">
+    <h2><a href="{% url 'tracker:session_detail' s.id %}">{{ s.day.program.name }} · {{ s.day.name }}</a></h2>
+    <p class="muted">
+      {% t "Started" "開始" %} {{ s.started_at|date:"Y-m-d H:i" }}
+      {% if s.finished_at %}· {% t "Finished" "結束" %} {{ s.finished_at|date:"Y-m-d H:i" }}{% else %}· {% t "In progress" "進行中" %}{% endif %}
+      · {{ s.sets.count }} {% t "set" "組" %}{{ s.sets.count|pluralize }}
+    </p>
+  </article>
+{% endfor %}
+{% else %}
+<p class="muted">{% t "No sessions yet. Start one from the Routines page." "尚無訓練紀錄，請從課表頁面開始。" %}</p>
+{% endif %}
+{% endblock %}

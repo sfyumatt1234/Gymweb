@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load bilingual %}
+{% block title %}{% t "Session · GymWeb" "訓練 · GymWeb" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <h1>{% t "Session" "訓練" %}: {{ session.day.program.name }} · {{ session.day.name }}</h1>
+  {% if not session.finished_at %}
+    <form method="post" action="{% url 'tracker:session_finish' session.id %}">
+      {% csrf_token %}
+      <button class="btn" type="submit">{% t "Finish session" "結束訓練" %}</button>
+    </form>
+  {% else %}
+    <span class="pill">{% t "Finished" "已結束" %} {{ session.finished_at|date:"Y-m-d H:i" }}</span>
+  {% endif %}
+</div>
+
+<section class="grid">
+  <div class="card">
+    <h2>{% t "Log a set" "記錄一組" %}</h2>
+    <form method="post" action="{% url 'tracker:session_add_set' session.id %}" class="form">
+      {% csrf_token %}
+      {% for field in set_form %}
+        <label><span>{{ field.label|safe }}</span>{{ field }}{{ field.errors }}</label>
+      {% endfor %}
+      <button class="btn" type="submit">{% t "Add set" "新增組數" %}</button>
+    </form>
+  </div>
+
+  <div class="card wide">
+    <h2>{% t "Sets logged" "已記錄組數" %}</h2>
+    {% if session.sets.all %}
+    <table class="table">
+      <thead><tr>
+        <th>{% t "Exercise" "動作" %}</th>
+        <th>{% t "Set" "第幾組" %}</th>
+        <th>{% t "Weight" "重量" %}</th>
+        <th>{% t "Reps" "次數" %}</th>
+        <th>RPE</th>
+        <th>{% t "Done" "完成" %}</th>
+      </tr></thead>
+      <tbody>
+      {% for s in session.sets.all %}
+        <tr>
+          <td>{{ s.exercise.name }}</td>
+          <td>{{ s.set_number }}</td>
+          <td>{{ s.weight_kg|default:"—" }}</td>
+          <td>{{ s.reps|default:"—" }}</td>
+          <td>{{ s.rpe|default:"—" }}</td>
+          <td>{% if s.done %}{% t "yes" "是" %}{% else %}{% t "no" "否" %}{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="muted">{% t "No sets logged yet." "尚無組數紀錄。" %}</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

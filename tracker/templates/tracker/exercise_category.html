@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+{% load bilingual %}
+{% block title %}{{ category.title }} / {{ category.title_zh }} — GymWeb{% endblock %}
+{% block content %}
+<nav class="crumb muted tiny">
+  <a href="{% url 'tracker:exercise_index' %}">{% t "Exercises" "動作庫" %}</a>
+  <span aria-hidden="true"> / </span>
+  <span>{{ category.title }} · {{ category.title_zh }}</span>
+</nav>
+
+<section class="page-head exercise-hero">
+  <img class="exercise-hero-img" src="{% static category.thumb %}" width="140" height="140" alt="" />
+  <div>
+    <h1>{{ category.title }} <span class="zh-inline">{{ category.title_zh }}</span></h1>
+    <p class="muted">{{ category.summary }}</p>
+    <p class="muted zh-sub">{{ category.summary_zh }}</p>
+  </div>
+</section>
+
+<div class="exercise-list">
+  {% for ex in category.exercises %}
+  <article class="exercise-card">
+    <img src="{% static ex.thumb %}" width="96" height="96" alt="" loading="lazy" />
+    <div class="exercise-card-main">
+      <h2>{{ ex.name }} <span class="zh-inline">{{ ex.name_zh }}</span></h2>
+      <p class="muted tiny"><strong>{% t "Equipment" "器材" %}:</strong> {{ ex.equipment }} · {{ ex.equipment_zh }}</p>
+      <p class="muted tiny"><strong>{% t "Primary" "主要目標" %}:</strong> {{ ex.primary }} · {{ ex.primary_zh }}</p>
+      <p class="exercise-notes">{{ ex.notes }}</p>
+      <p class="exercise-notes zh-sub">{{ ex.notes_zh }}</p>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

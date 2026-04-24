@@ -1,0 +1,10 @@
+# Django 6+ requires mysqlclient 2.2.1+ for the MySQL backend. On Windows we
+# skip mysqlclient (see below) and use PyMySQL as MySQLdb, which fails that
+# version check. Keep Django on 5.x until Windows installs mysqlclient or we
+# adopt another driver strategy.
+Django>=5.0,<6.0
+python-decouple>=3.8
+# MySQL driver. mysqlclient is preferred (compiled, fastest); PyMySQL is the
+# pure-Python fallback that "just works" without MySQL C headers.
+mysqlclient>=2.2 ; sys_platform != "win32"
+PyMySQL>=1.1

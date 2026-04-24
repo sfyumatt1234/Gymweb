@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+{% load bilingual %}
+{% block title %}{% t "Exercise library — GymWeb" "動作庫 — GymWeb" %}{% endblock %}
+{% block topbar_title %}{% t "Exercises" "動作庫" %}{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>{% t "Exercise library" "動作庫" %}</h1>
+  <p class="muted">
+    {% t "Browse moves by muscle group. Thumbnails are simple icons shipped with GymWeb (not scraped from other sites)." "依肌群瀏覽動作。縮圖為本專案內建圖示（並未從其他網站抓取）。" %}
+    {% t "Use filters below like MuscleWiki (equipment + muscles)." "可使用下方器材／肌群勾選篩選（類似 MuscleWiki）。" %}
+  </p>
+</section>
+
+<form class="exercise-filter-form" method="get" action="{% url 'tracker:exercise_index' %}">
+  <div class="search-row">
+    <label class="search-field wide">
+      <span class="tiny muted">{% t "Search" "搜尋" %}</span>
+      <input class="input" type="text" name="q" value="{{ q }}" placeholder="bench, curl, 深蹲…" autocomplete="off" />
+    </label>
+    <label class="search-field">
+      <span class="tiny muted">{% t "Equipment (text)" "器材（文字）" %}</span>
+      <input class="input" type="text" name="equipment" value="{{ equipment }}" placeholder="cable, barbell…" />
+    </label>
+    <div class="search-actions">
+      <button class="btn" type="submit">{% t "Apply filters" "套用篩選" %}</button>
+      <a class="btn ghost" href="{% url 'tracker:exercise_index' %}">{% t "Reset" "重置" %}</a>
+    </div>
+  </div>
+
+  {% if equip_keys or muscle_keys or q %}
+  <div class="active-filters-bar">
+    <span class="tiny muted">{% t "Active filters" "已套用篩選" %}</span>
+    {% if q %}<span class="pill">{{ q }}</span>{% endif %}
+    {% for k in equip_keys %}<span class="pill">{{ k }}</span>{% endfor %}
+    {% for k in muscle_keys %}<span class="pill">{{ k }}</span>{% endfor %}
+  </div>
+  {% endif %}
+
+  <details class="filter-groups" {% if equip_keys or muscle_keys %}open{% endif %}>
+    <summary>{% t "Equipment & muscles" "器材與肌群" %} <span class="tiny muted">({% t "multi-select" "可多選" %})</span></summary>
+
+    <div class="filter-section">
+      <h3 class="filter-heading">{% t "Equipment (category)" "器材（分類）" %}</h3>
+      <div class="chip-grid">
+        {% for key, en, zh, _words in equipment_options %}
+        <label class="chip">
+          <input type="checkbox" name="equip" value="{{ key }}" {% if key in equip_keys %}checked{% endif %} />
+          <span>{{ en }} <span class="zh-inline">{{ zh }}</span></span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h3 class="filter-heading">{% t "Muscles" "肌群" %}</h3>
+      <div class="chip-grid chip-grid-tall">
+        {% for key, en, zh, _pred in muscle_options %}
+        <label class="chip">
+          <input type="checkbox" name="muscle" value="{{ key }}" {% if key in muscle_keys %}checked{% endif %} />
+          <span>{{ en }} <span class="zh-inline">{{ zh }}</span></span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+  </details>
+</form>
+
+<div class="exercise-cat-grid">
+  {% for cat in categories %}
+  <a class="exercise-cat-card" href="{% url 'tracker:exercise_category' cat.slug %}">
+    <img src="{% static cat.thumb %}" width="120" height="120" alt="" loading="lazy" />
+    <div class="exercise-cat-body">
+      <h2>{{ cat.title }} <span class="zh-inline">{{ cat.title_zh }}</span></h2>
+      <p class="muted tiny">{{ cat.summary|truncatewords:22 }}</p>
+      <p class="muted tiny zh-sub">{{ cat.summary_zh|truncatewords:22 }}</p>
+      <span class="pill">{{ cat.exercises|length }} {% t "exercises" "個動作" %}</span>
+    </div>
+  </a>
+  {% empty %}
+  <div class="card wide">
+    <p class="muted">{% t "No exercises matched. Try fewer filters or reset." "沒有符合的動作，請減少篩選條件或重置。" %}</p>
+    <a class="btn" href="{% url 'tracker:exercise_index' %}">{% t "Reset filters" "重置篩選" %}</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

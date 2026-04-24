@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load bilingual %}
+{% block title %}{{ day.name }} · GymWeb{% endblock %}
+
+{% block content %}
+<div class="row">
+  <h1>{{ day.program.name }} · {{ day.name }}</h1>
+  <form method="post" action="{% url 'tracker:session_start' day.id %}">
+    {% csrf_token %}
+    <button class="btn" type="submit">{% t "Start session" "開始訓練" %}</button>
+  </form>
+</div>
+
+{% for ex in day.exercises.all %}
+<article class="card">
+  <h2>{{ ex.name }}</h2>
+  <p class="muted">{{ ex.target_sets }} × {{ ex.target_reps }} · {% t "rest" "休息" %} {{ ex.rest_seconds }}s</p>
+  {% if ex.coaching_cue %}<p><b>{% t "Cue" "提示" %}:</b> {{ ex.coaching_cue }}</p>{% endif %}
+  {% if ex.setup %}<p><b>{% t "Setup" "準備" %}.</b> {{ ex.setup }}</p>{% endif %}
+  {% if ex.execution %}<p><b>{% t "Execution" "動作" %}.</b> {{ ex.execution }}</p>{% endif %}
+  {% if ex.common_mistakes %}<p><b>{% t "Common mistakes" "常見錯誤" %}.</b> {{ ex.common_mistakes }}</p>{% endif %}
+  {% if ex.reference_url %}<p><a href="{{ ex.reference_url }}" target="_blank" rel="noreferrer">{% t "Reference" "參考連結" %}</a></p>{% endif %}
+</article>
+{% endfor %}
+{% endblock %}

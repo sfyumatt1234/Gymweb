@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load bilingual %}
+{% block title %}{% t "Planning — GymWeb" "規劃 — GymWeb" %}{% endblock %}
+{% block topbar_title %}{% t "Planning" "規劃" %}{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>{% t "Planning" "規劃" %}</h1>
+  <p class="muted">{% t "Pick a goal, muscle focus, and equipment. Then generate a workout plan." "選擇目標、主練肌群與器材後，產生訓練清單。" %}</p>
+</section>
+
+<form class="card" method="get" action="{% url 'tracker:planning_results' %}">
+  <div class="grid">
+    <div>
+      <label>
+        <span>{% t "Goal" "目標" %}</span>
+        <select class="input" name="goal">
+          <option value="gain">{% t "Gain muscle" "增肌" %}</option>
+          <option value="strength">{% t "Strength" "力量" %}</option>
+          <option value="fatloss">{% t "Lose fat" "減脂" %}</option>
+        </select>
+      </label>
+    </div>
+    <div>
+      <label>
+        <span>{% t "Level" "程度" %}</span>
+        <select class="input" name="level">
+          <option value="beginner">{% t "Beginner" "初學" %}</option>
+          <option value="intermediate" selected>{% t "Intermediate" "中級" %}</option>
+          <option value="advanced">{% t "Advanced" "進階" %}</option>
+        </select>
+      </label>
+    </div>
+    <div>
+      <label>
+        <span>{% t "Focus muscle group" "主練肌群" %}</span>
+        <select class="input" name="focus">
+          <option value="chest">{% t "Chest" "胸部" %}</option>
+          <option value="back">{% t "Back" "背部" %}</option>
+          <option value="legs">{% t "Legs" "腿部" %}</option>
+          <option value="shoulders">{% t "Shoulders" "肩部" %}</option>
+          <option value="arms">{% t "Arms" "手臂" %}</option>
+          <option value="core">{% t "Core" "核心" %}</option>
+          <option value="abductors">{% t "Abductors" "髖外展" %}</option>
+        </select>
+      </label>
+    </div>
+    <div>
+      <label>
+        <span>{% t "Equipment" "器材" %}</span>
+        <select class="input" name="equipment">
+          <option value="any">{% t "Any" "不限" %}</option>
+          <option value="technogym">{% t "Technogym" "Technogym" %}</option>
+          <option value="hammer">{% t "Hammer Strength" "Hammer Strength" %}</option>
+          <option value="cable">{% t "Cable" "滑輪" %}</option>
+          <option value="dumbbell">{% t "Dumbbells" "啞鈴" %}</option>
+          <option value="barbell">{% t "Barbell" "槓鈴" %}</option>
+          <option value="bodyweight">{% t "Bodyweight" "徒手" %}</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="actions" style="margin-top: .75rem;">
+    <button class="btn" type="submit">{% t "Generate workout" "產生訓練" %}</button>
+    <a class="btn ghost" href="{% url 'tracker:exercise_index' %}">{% t "Browse exercises" "先看動作庫" %}</a>
+  </div>
+  <p class="tiny muted" style="margin-top:.6rem;">
+    {% t "This is a first iteration. Next we can add schedule frequency, machine availability, and progression." "這是第一版，下一步可加入每週頻率、機台可用性與進度規則。" %}
+  </p>
+</form>
+{% endblock %}

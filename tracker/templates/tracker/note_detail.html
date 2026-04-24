@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load bilingual %}
+{% block title %}{{ note.title }} · Gymweb{% endblock %}
+{% block topbar_title %}{% t "Knowledge note" "知識筆記" %}{% endblock %}
+
+{% block content %}
+<div class="crumb"><a href="{% url 'tracker:note_list' %}">{% t "Knowledge notes" "知識筆記" %}</a></div>
+
+<section class="note-detail">
+  <article class="card note-main">
+    <div class="page-head">
+      <h1>{{ note.title }}</h1>
+      <p>
+        {{ note.get_source_type_display }} · {{ note.language_code|default:"—" }}
+        {% if note.source_path %}· <code>{{ note.source_path }}</code>{% endif %}
+      </p>
+    </div>
+
+    {% if note.tag_list %}
+      <div class="tag-row">
+        {% for tag in note.tag_list %}
+          <span class="tag-chip">{{ tag }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if note.summary %}
+      <div class="note-summary-block">
+        <h2>{% t "Summary" "摘要" %}</h2>
+        <div class="note-rich">{{ note.summary|linebreaksbr }}</div>
+      </div>
+    {% endif %}
+
+    {% if note.sections.all %}
+      <div class="note-sections">
+        {% for section in note.sections.all %}
+          <section class="note-section">
+            <div class="note-section-head">
+              <h2>{{ section.heading }}{% if section.heading_zh %}<span class="zh-inline">{{ section.heading_zh }}</span>{% endif %}</h2>
+              <span class="pill">{{ section.get_section_type_display }}</span>
+            </div>
+            <div class="note-rich">{{ section.content|linebreaksbr }}</div>
+          </section>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if note.raw_text %}
+      <details class="note-raw">
+        <summary>{% t "Source transcript / raw text" "來源逐字稿／原始內容" %}</summary>
+        <div class="note-rich">{{ note.raw_text|linebreaksbr }}</div>
+      </details>
+    {% endif %}
+  </article>
+
+  <aside class="note-side">
+    <div class="card">
+      <h2>{% t "Metadata" "中繼資料" %}</h2>
+      <ul class="kv">
+        <li><span>{% t "Created" "建立於" %}</span><b>{{ note.created_at|date:"Y-m-d H:i" }}</b></li>
+        <li><span>{% t "Updated" "更新於" %}</span><b>{{ note.updated_at|date:"Y-m-d H:i" }}</b></li>
+        <li><span>{% t "Sections" "段落數" %}</span><b>{{ note.sections.count }}</b></li>
+        <li><span>{% t "Source type" "來源類型" %}</span><b>{{ note.get_source_type_display }}</b></li>
+      </ul>
+      <p><a class="btn ghost" href="{% url 'tracker:note_list' %}">{% t "Back to notes" "返回筆記列表" %}</a></p>
+    </div>
+  </aside>
+</section>
+{% endblock %}

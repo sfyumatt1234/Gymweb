@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load bilingual %}
+{% block title %}{% t "New knowledge note · Gymweb" "新增知識筆記 · Gymweb" %}{% endblock %}
+{% block topbar_title %}{% t "New knowledge note" "新增知識筆記" %}{% endblock %}
+
+{% block content %}
+<div class="crumb"><a href="{% url 'tracker:note_list' %}">{% t "Knowledge notes" "知識筆記" %}</a></div>
+
+<div class="page-head">
+  <h1>{% t "Create knowledge note" "建立知識筆記" %}</h1>
+  <p>{% t "Use this for imported transcripts, research summaries, or your own structured notes." "可用於匯入逐字稿、整理研究內容，或建立自己的結構化筆記。" %}</p>
+</div>
+
+<form method="post" class="form note-form">
+  {% csrf_token %}
+  {% for field in form %}
+    <label>
+      {{ field.label_tag }}
+      {{ field }}
+      {% if field.help_text %}<span class="tiny">{{ field.help_text }}</span>{% endif %}
+      {% for error in field.errors %}<span class="tiny" style="color:#f5b6b6;">{{ error }}</span>{% endfor %}
+    </label>
+  {% endfor %}
+  <div class="actions">
+    <button class="btn" type="submit">{% t "Save note" "儲存筆記" %}</button>
+    <a class="btn ghost" href="{% url 'tracker:note_list' %}">{% t "Cancel" "取消" %}</a>
+  </div>
+</form>
+{% endblock %}
