@@ -4,6 +4,8 @@ from .models import (
     BodyLog,
     Day,
     Exercise,
+    KnowledgeNote,
+    KnowledgeSection,
     Profile,
     Program,
     SetEntry,
@@ -19,6 +21,11 @@ class DayInline(admin.TabularInline):
 class ExerciseInline(admin.StackedInline):
     model = Exercise
     extra = 1
+
+
+class KnowledgeSectionInline(admin.StackedInline):
+    model = KnowledgeSection
+    extra = 0
 
 
 @admin.register(Profile)
@@ -54,6 +61,22 @@ class ExerciseAdmin(admin.ModelAdmin):
 @admin.register(WorkoutSession)
 class WorkoutSessionAdmin(admin.ModelAdmin):
     list_display = ("day", "profile", "started_at", "finished_at")
+
+
+@admin.register(KnowledgeNote)
+class KnowledgeNoteAdmin(admin.ModelAdmin):
+    list_display = ("title", "profile", "source_type", "language_code", "updated_at")
+    search_fields = ("title", "summary", "tags", "raw_text")
+    list_filter = ("source_type", "language_code")
+    inlines = [KnowledgeSectionInline]
+    prepopulated_fields = {"slug": ("title",)}
+
+
+@admin.register(KnowledgeSection)
+class KnowledgeSectionAdmin(admin.ModelAdmin):
+    list_display = ("note", "sort_order", "heading", "section_type")
+    list_filter = ("section_type",)
+    search_fields = ("heading", "heading_zh", "content")
 
 
 @admin.register(SetEntry)

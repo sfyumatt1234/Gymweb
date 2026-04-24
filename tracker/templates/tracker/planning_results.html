@@ -8,6 +8,10 @@
 <section class="page-head">
   <h1>{{ plan_title }}</h1>
   <p class="muted">{{ plan_subtitle }}</p>
+  <p class="tiny muted">{{ source_label }}</p>
+  {% if remote_error %}
+  <p class="tiny muted">{{ remote_error }}</p>
+  {% endif %}
 </section>
 
 <div class="results-layout">
@@ -15,7 +19,11 @@
     {% for item in items %}
     <article class="result-card">
       <div class="result-media">
+        {% if item.image_url %}
+        <img src="{{ item.image_url }}" alt="" width="260" height="170" loading="lazy" referrerpolicy="no-referrer" />
+        {% else %}
         <img src="{% static item.thumb %}" alt="" width="260" height="170" loading="lazy" />
+        {% endif %}
       </div>
       <div class="result-body">
         <div class="result-head">
@@ -23,7 +31,9 @@
             <h2>{{ item.name }} <span class="zh-inline">{{ item.name_zh }}</span></h2>
             <p class="muted tiny">{{ item.equipment }} · {{ item.equipment_zh }}</p>
           </div>
+          {% if item.category_slug %}
           <a class="icon-btn" href="{% url 'tracker:exercise_category' item.category_slug %}" title="Browse category">↗</a>
+          {% endif %}
         </div>
         <div class="result-grid">
           <div class="result-metric">

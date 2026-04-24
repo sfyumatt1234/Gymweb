@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load bilingual %}
+{% block title %}{% t "Knowledge notes · Gymweb" "知識筆記 · Gymweb" %}{% endblock %}
+{% block topbar_title %}{% t "Knowledge notes" "知識筆記" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="page-head">
+    <h1>{% t "Knowledge notes" "知識筆記" %}</h1>
+    <p>{% t "Capture research, imported transcripts, and practical health takeaways in one place." "把研究摘要、逐字稿匯入與可執行重點整理成可搜尋的筆記。" %}</p>
+  </div>
+  <div class="actions">
+    <a class="btn" href="{% url 'tracker:note_create' %}">{% t "+ New note" "＋ 新增筆記" %}</a>
+  </div>
+</div>
+
+<form class="exercise-search" method="get">
+  <label>
+    <span>{% t "Search notes" "搜尋筆記" %}</span>
+    <input class="input" type="text" name="q" value="{{ q }}" placeholder="fasting, insulin, safety" />
+  </label>
+  <button class="btn" type="submit">{% t "Search" "搜尋" %}</button>
+  {% if q %}
+    <a class="btn ghost" href="{% url 'tracker:note_list' %}">{% t "Clear" "清除" %}</a>
+  {% endif %}
+</form>
+
+{% if notes %}
+  <div class="note-list">
+    {% for note in notes %}
+      <article class="note-card">
+        <div class="note-card-head">
+          <div>
+            <h2><a href="{% url 'tracker:note_detail' note.slug %}">{{ note.title }}</a></h2>
+            <p class="muted">
+              {{ note.get_source_type_display }} · {{ note.language_code|default:"—" }} ·
+              {% t "updated" "更新於" %} {{ note.updated_at|date:"Y-m-d H:i" }}
+            </p>
+          </div>
+          <span class="pill">{{ note.sections.count }} {% t "sections" "段落" %}</span>
+        </div>
+
+        {% if note.summary %}
+          <p class="note-summary">{{ note.summary|linebreaksbr }}</p>
+        {% endif %}
+
+        {% if note.tag_list %}
+          <div class="tag-row">
+            {% for tag in note.tag_list %}
+              <span class="tag-chip">{{ tag }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="note-card-foot">
+          <a class="btn ghost" href="{% url 'tracker:note_detail' note.slug %}">{% t "Open note" "查看筆記" %}</a>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card">
+    <p class="muted">
+      {% if q %}
+        {% t "No notes matched your search." "沒有符合搜尋條件的筆記。" %}
+      {% else %}
+        {% t "No knowledge notes yet. Import a transcript or create one manually." "目前還沒有知識筆記，可先匯入逐字稿或手動建立。" %}
+      {% endif %}
+    </p>
+  </div>
+{% endif %}
+{% endblock %}

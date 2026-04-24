@@ -6,7 +6,9 @@ import csv
 import json
 from datetime import timedelta
 
+from django.conf import settings
 from django.contrib import messages
+from django.db.models import Q
 
 from .i18n_ui import bilingual_line
 from django.http import Http404, HttpResponse
@@ -22,16 +24,18 @@ from .exercise_filters import (
     normalize_multi_param,
 )
 from .exercise_library import all_categories, get_category
-from .forms import BodyLogForm, ProfileForm, SetEntryForm
+from .forms import BodyLogForm, KnowledgeNoteForm, ProfileForm, SetEntryForm
 from .models import (
     BodyLog,
     Day,
     Exercise,
+    KnowledgeNote,
     Profile,
     Program,
     SetEntry,
     WorkoutSession,
 )
+from .services.exercisedb import ExerciseDbClient, ExerciseDbError
 
 
 def _get_or_create_singleton_profile() -> Profile:
@@ -296,6 +300,70 @@ def history(request):
     return render(request, "tracker/history.html", {"sessions": sessions})
 
 
+# Knowledge notes -------------------------------------------------------------
+
+def note_list(request):
+    profile = _get_or_create_singleton_profile()
+    q = (request.GET.get("q") or "").strip()
+    notes = profile.knowledge_notes.prefetch_related("sections")
+    if q:
+        notes = notes.filter(
+            Q(title__icontains=q)
+            | Q(summary__icontains=q)
+            | Q(tags__icontains=q)
+            | Q(raw_text__icontains=q)
+            | Q(sections__content__icontains=q)
+            | Q(sections__heading__icontains=q)
+            | Q(sections__heading_zh__icontains=q)
+        ).distinct()
+    return render(
+        request,
+        "tracker/note_list.html",
+        {"notes": notes, "q": q, "profile": profile},
+    )
+
+
+def note_detail(request, slug: str):
+    profile = _get_or_create_singleton_profile()
+    note = get_object_or_404(
+        KnowledgeNote.objects.prefetch_related("sections"),
+        slug=slug,
+        profile=profile,
+    )
+    return render(
+        request,
+        "tracker/note_detail.html",
+        {"note": note, "profile": profile},
+    )
+
+
+def note_create(request):
+    profile = _get_or_create_singleton_profile()
+    if request.method == "POST":
+        form = KnowledgeNoteForm(request.POST)
+        if form.is_valid():
+            note = form.save(commit=False)
+            note.profile = profile
+            note.save()
+            messages.success(
+                request,
+                bilingual_line("Note saved.", "筆記已儲存。"),
+            )
+            return redirect("tracker:note_detail", slug=note.slug)
+    else:
+        form = KnowledgeNoteForm(
+            initial={
+                "language_code": "zh-Hant",
+                "source_type": KnowledgeNote.SourceType.MANUAL,
+            }
+        )
+    return render(
+        request,
+        "tracker/note_form.html",
+        {"form": form, "profile": profile},
+    )
+
+
 # Exercise library (curated reference + local thumbnails) ----------------------
 
 
@@ -378,12 +446,96 @@ def exercise_category(request, slug: str):
 # MuscleWiki-like navigation stubs -------------------------------------------
 
 
+def _exercise_db_bodypart_for_focus(focus: str) -> str | None:
+    return {
+        "chest": "Chest",
+        "back": "Back",
+        "legs": "Upper Legs",
+        "shoulders": "Shoulders",
+        "arms": "Upper Arms",
+        "core": "Waist",
+        "abductors": "Upper Legs",
+    }.get(focus)
+
+
+def _exercise_db_equipment_value(equipment: str) -> str | None:
+    return {
+        "any": None,
+        "cable": "Cable",
+        "dumbbell": "Dumbbell",
+        "barbell": "Barbell",
+        "bodyweight": "Body Weight",
+    }.get((equipment or "").strip().lower())
+
+
+def _remote_plan_items(focus: str, equipment: str, sets: int, rep_scheme: str, rest: str) -> list[dict]:
+    body_part = _exercise_db_bodypart_for_focus(focus)
+    if not body_part:
+        return []
+
+    client = ExerciseDbClient.from_settings()
+    response = client.list_exercises(
+        bodyParts=body_part,
+        equipments=_exercise_db_equipment_value(equipment),
+        limit=6,
+    )
+
+    items = []
+    for ex in response.get("data", []):
+        items.append(
+            {
+                "name": ex.get("name", ""),
+                "name_zh": "",
+                "equipment": ", ".join(ex.get("equipments") or []),
+                "equipment_zh": "",
+                "thumb": "",
+                "image_url": ex.get("imageUrl", ""),
+                "sets": sets,
+                "reps": rep_scheme,
+                "rest": rest,
+                "primary": ", ".join(ex.get("targetMuscles") or ex.get("bodyParts") or []),
+                "primary_zh": "",
+                "notes": (ex.get("overview") or "")[:220],
+                "notes_zh": "",
+                "category_slug": focus or "chest",
+            }
+        )
+    return items
+
+
+def _local_plan_items(cat, sets: int, rep_scheme: str, rest: str) -> list[dict]:
+    items = []
+    for ex in cat.exercises[:6]:
+        items.append(
+            {
+                "name": ex.name,
+                "name_zh": ex.name_zh,
+                "equipment": ex.equipment,
+                "equipment_zh": ex.equipment_zh,
+                "thumb": ex.thumb,
+                "image_url": "",
+                "sets": sets,
+                "reps": rep_scheme,
+                "rest": rest,
+                "primary": ex.primary,
+                "primary_zh": ex.primary_zh,
+                "notes": ex.notes,
+                "notes_zh": ex.notes_zh,
+                "category_slug": cat.slug,
+            }
+        )
+    return items
+
+
 def planning(request):
     categories = list(all_categories())
     return render(
         request,
         "tracker/planning.html",
-        {"categories": categories},
+        {
+            "categories": categories,
+            "exercisedb_enabled": settings.EXERCISEDB_ENABLED,
+        },
     )
 
 
@@ -396,8 +548,6 @@ def planning_results(request):
     cat = get_category(focus) or get_category("chest")
     assert cat is not None
 
-    # Very simple generator: pick the first N exercises from the category and
-    # attach sets/reps based on goal + level.
     if goal in ("strength",):
         rep_scheme = "3–5"
         sets = 4 if level in ("intermediate", "advanced") else 3
@@ -412,37 +562,55 @@ def planning_results(request):
         rest = "90–150s"
 
     items = []
-    for ex in cat.exercises[:6]:
-        items.append(
-            {
-                "name": ex.name,
-                "name_zh": ex.name_zh,
-                "equipment": ex.equipment,
-                "equipment_zh": ex.equipment_zh,
-                "thumb": ex.thumb,
-                "sets": sets,
-                "reps": rep_scheme,
-                "rest": rest,
-                "primary": ex.primary,
-                "primary_zh": ex.primary_zh,
-            }
+    source_label = bilingual_line("Gymweb curated library", "Gymweb 內建動作庫")
+    remote_error = ""
+    try:
+        items = _remote_plan_items(cat.slug, equipment, sets, rep_scheme, rest)
+        if items:
+            source_label = bilingual_line("ExerciseDB suggestions", "ExerciseDB 建議結果")
+    except ExerciseDbError:
+        remote_error = bilingual_line(
+            "ExerciseDB was unavailable, so Gymweb used the built-in exercise library.",
+            "ExerciseDB 暫時不可用，已改用 Gymweb 內建動作庫。",
         )
 
-    # Coverage is a lightweight proxy; later we can compute real coverage.
+    if not items:
+        items = _local_plan_items(cat, sets, rep_scheme, rest)
+
     coverage = min(92, 44 + len(items) * 6)
-    summary = {
-        "coverage": coverage,
-        "muscle_groups": 1,
-        "goal": goal,
-        "level": level,
-        "focus": cat,
-        "equipment": equipment,
+    goal_labels = {
+        "gain": bilingual_line("Gain muscle", "增肌"),
+        "strength": bilingual_line("Strength", "力量"),
+        "fatloss": bilingual_line("Lose fat", "減脂"),
+        "lose": bilingual_line("Lose fat", "減脂"),
+        "cut": bilingual_line("Lose fat", "減脂"),
+    }
+    level_labels = {
+        "beginner": bilingual_line("Beginner", "初學"),
+        "intermediate": bilingual_line("Intermediate", "中級"),
+        "advanced": bilingual_line("Advanced", "進階"),
     }
 
     return render(
         request,
         "tracker/planning_results.html",
-        {"items": items, "summary": summary},
+        {
+            "items": items,
+            "plan_title": bilingual_line(f"{cat.title} workout plan", f"{cat.title_zh} 訓練計畫"),
+            "plan_subtitle": bilingual_line(
+                f"{source_label} tuned for {goal_labels.get(goal, goal)} and {level_labels.get(level, level)}.",
+                f"{source_label}，已依 {goal_labels.get(goal, goal)} 與 {level_labels.get(level, level)} 調整。",
+            ),
+            "goal_label": goal_labels.get(goal, goal),
+            "level_label": level_labels.get(level, level),
+            "exercise_count": len(items),
+            "muscle_group_count": 1,
+            "coverage_pct": coverage,
+            "targeted_slugs": [cat.slug],
+            "targeted_categories": [cat],
+            "source_label": source_label,
+            "remote_error": remote_error,
+        },
     )
 
 

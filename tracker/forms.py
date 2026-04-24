@@ -1,7 +1,14 @@
 from django import forms
 
 from .i18n_ui import bilingual_line
-from .models import UNITS_IMPERIAL, UNITS_METRIC, BodyLog, Profile, SetEntry
+from .models import (
+    UNITS_IMPERIAL,
+    UNITS_METRIC,
+    BodyLog,
+    KnowledgeNote,
+    Profile,
+    SetEntry,
+)
 
 
 def _choice_bilingual(en: str, zh: str) -> str:
@@ -96,3 +103,52 @@ class SetEntryForm(forms.ModelForm):
         self.fields["reps"].label = bilingual_line("Reps", "次數")
         self.fields["rpe"].label = bilingual_line("RPE", "自覺吃力程度（RPE）")
         self.fields["done"].label = bilingual_line("Done", "完成")
+
+
+class KnowledgeNoteForm(forms.ModelForm):
+    class Meta:
+        model = KnowledgeNote
+        fields = [
+            "title",
+            "source_type",
+            "source_path",
+            "language_code",
+            "tags",
+            "summary",
+            "raw_text",
+        ]
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "input"}),
+            "source_type": forms.Select(attrs={"class": "input"}),
+            "source_path": forms.TextInput(attrs={"class": "input"}),
+            "language_code": forms.TextInput(attrs={"class": "input"}),
+            "tags": forms.TextInput(
+                attrs={"class": "input", "placeholder": "fasting, metabolism, safety"}
+            ),
+            "summary": forms.Textarea(attrs={"class": "input", "rows": 4}),
+            "raw_text": forms.Textarea(attrs={"class": "input", "rows": 12}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["title"].label = bilingual_line("Title", "標題")
+        self.fields["source_type"].label = bilingual_line("Source type", "來源類型")
+        self.fields["source_path"].label = bilingual_line("Source path", "來源路徑")
+        self.fields["language_code"].label = bilingual_line("Language code", "語言代碼")
+        self.fields["tags"].label = bilingual_line("Tags", "標籤")
+        self.fields["summary"].label = bilingual_line("Summary", "摘要")
+        self.fields["raw_text"].label = bilingual_line("Source text", "原始內容")
+        self.fields["source_type"].choices = [
+            (
+                KnowledgeNote.SourceType.MANUAL,
+                _choice_bilingual("Manual note", "手動筆記"),
+            ),
+            (
+                KnowledgeNote.SourceType.TRANSCRIPT,
+                _choice_bilingual("Transcript import", "逐字稿匯入"),
+            ),
+            (
+                KnowledgeNote.SourceType.IMPORTED,
+                _choice_bilingual("Imported article", "匯入文章"),
+            ),
+        ]

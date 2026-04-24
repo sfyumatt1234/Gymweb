@@ -13,6 +13,7 @@ from __future__ import annotations
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 
 
 UNITS_METRIC = "metric"
@@ -159,6 +160,82 @@ class WorkoutSession(models.Model):
 
     def __str__(self) -> str:  # pragma: no cover - trivial
         return f"Session {self.day} @ {self.started_at:%Y-%m-%d}"
+
+
+class KnowledgeNote(models.Model):
+    """A saved knowledge note with preserved source text and structured sections."""
+
+    class SourceType(models.TextChoices):
+        MANUAL = "manual", "Manual note"
+        TRANSCRIPT = "transcript", "Transcript import"
+        IMPORTED = "imported", "Imported article"
+
+    profile = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, related_name="knowledge_notes",
+        null=True, blank=True,
+    )
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=220, unique=True, blank=True)
+    source_type = models.CharField(
+        max_length=20, choices=SourceType.choices, default=SourceType.MANUAL
+    )
+    source_path = models.CharField(max_length=500, blank=True)
+    language_code = models.CharField(max_length=20, default="zh-Hant", blank=True)
+    summary = models.TextField(blank=True)
+    tags = models.CharField(max_length=240, blank=True, help_text="Comma-separated tags.")
+    raw_text = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at", "-created_at"]
+
+    def __str__(self) -> str:  # pragma: no cover - trivial
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.title:
+            base_slug = slugify(self.title, allow_unicode=True)[:200] or "note"
+            slug = base_slug
+            suffix = 2
+            while KnowledgeNote.objects.exclude(pk=self.pk).filter(slug=slug).exists():
+                slug = f"{base_slug[:190]}-{suffix}"
+                suffix += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    @property
+    def tag_list(self) -> list[str]:
+        return [tag.strip() for tag in self.tags.split(",") if tag.strip()]
+
+
+class KnowledgeSection(models.Model):
+    """A structured subsection inside a knowledge note."""
+
+    class SectionType(models.TextChoices):
+        OVERVIEW = "overview", "Overview"
+        TIMELINE = "timeline", "Timeline"
+        MECHANISM = "mechanism", "Mechanism"
+        BENEFIT = "benefit", "Benefit"
+        RISK = "risk", "Risk"
+        PRACTICAL = "practical", "Practical takeaway"
+
+    note = models.ForeignKey(
+        KnowledgeNote, on_delete=models.CASCADE, related_name="sections"
+    )
+    heading = models.CharField(max_length=120)
+    heading_zh = models.CharField(max_length=120, blank=True)
+    section_type = models.CharField(
+        max_length=20, choices=SectionType.choices, default=SectionType.OVERVIEW
+    )
+    sort_order = models.PositiveSmallIntegerField(default=0)
+    content = models.TextField()
+
+    class Meta:
+        ordering = ["sort_order", "id"]
+
+    def __str__(self) -> str:  # pragma: no cover - trivial
+        return f"{self.note.title} · {self.heading}"
 
 
 class SetEntry(models.Model):

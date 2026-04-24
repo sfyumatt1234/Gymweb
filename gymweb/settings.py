@@ -159,3 +159,15 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_URL = "/admin/login/"
+
+EXERCISEDB_ENABLED = _cfg("EXERCISEDB_ENABLED", default=False, cast=bool)
+EXERCISEDB_API_KEY = _cfg("EXERCISEDB_API_KEY", default="")
+EXERCISEDB_API_HOST = _cfg(
+    "EXERCISEDB_API_HOST",
+    default="edb-with-videos-and-images-by-ascendapi.p.rapidapi.com",
+)
+EXERCISEDB_API_BASE_URL = _cfg(
+    "EXERCISEDB_API_BASE_URL",
+    default="https://edb-with-videos-and-images-by-ascendapi.p.rapidapi.com",
+)
+EXERCISEDB_TIMEOUT_SECONDS = _cfg("EXERCISEDB_TIMEOUT_SECONDS", default=20, cast=int)
